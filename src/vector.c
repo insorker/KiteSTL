@@ -57,6 +57,8 @@ int vector_empty(Vector *vec) {
 }
 
 void *vector_at(Vector *vec, int n) {
+  assert(0 <= n && n < vec->_size);
+
   return vec->_elem + vec->_size_type * n;
 }
 
