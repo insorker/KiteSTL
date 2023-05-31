@@ -1,0 +1,27 @@
+---
+name: "release"
+
+on:
+  push:
+    branches:
+      - "main"
+    tags:
+      - "*"
+
+jobs:
+  release:
+    name: "Release"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: "Build"
+        run: "make"
+
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "lib/*.so"
+          tag: "0.1.0"
