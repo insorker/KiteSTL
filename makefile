@@ -1,5 +1,3 @@
-include test.mk
-
 SRC_DIR=src
 INC_DIR=src
 
@@ -26,3 +24,5 @@ ${TARGET_DIR}/%.o: ${SRC_DIR}/%.c
 
 clean:
 	rm -rf *.out ${TARGET_DIR}
+
+include test.mk
