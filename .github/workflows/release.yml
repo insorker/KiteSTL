@@ -1,5 +1,4 @@
----
-name: "release"
+name: Releases
 
 on:
   push:
@@ -10,13 +9,12 @@ on:
 
 jobs:
   release:
-    name: "Release"
+    name: "Releases"
     runs-on: "ubuntu-latest"
-
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       - name: "Build"
         run: "make"
@@ -24,4 +22,4 @@ jobs:
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "lib/*.so"
-          tag: "0.1.0"
+          tag: "0.1.1"
