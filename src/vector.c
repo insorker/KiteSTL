@@ -6,21 +6,21 @@
 
 #define VECTOR_DEFAULT_CAPACITY 3
 
-int vector_size(Vector *);
-int vector_empty(Vector *);
-void *vector_at(Vector *, int n);
-void vector_insert(Vector *, int n, void *val);
-void vector_remove(Vector *, int n);
-void vector_push_back(Vector *, void *val);
-void vector_pop_back(Vector *);
-void vector_clear(Vector *);
+static int vector_size(vector_t *);
+static int vector_empty(vector_t *);
+static void *vector_at(vector_t *, int n);
+static void vector_insert(vector_t *, int n, void *val);
+static void vector_remove(vector_t *, int n);
+static void vector_push_back(vector_t *, void *val);
+static void vector_pop_back(vector_t *);
+static void vector_clear(vector_t *);
 
-void vector_expand(Vector *);
-void vector_shrink(Vector *);
+static void vector_expand(vector_t *);
+static void vector_shrink(vector_t *);
 
 
-Vector *new_vector(int size_type) {
-  Vector *vec = (Vector *)malloc(sizeof(Vector));
+vector_t *new_vector(int size_type) {
+  vector_t *vec = (vector_t *)malloc(sizeof(vector_t));
 
   vec->size = vector_size;
   vec->empty = vector_empty;
@@ -42,27 +42,27 @@ Vector *new_vector(int size_type) {
   return vec;
 }
 
-void free_vector(Vector *vec) {
+void free_vector(vector_t *vec) {
   free(vec->_elem);
   free(vec);
 }
 
 
-int vector_size(Vector *vec) {
+static int vector_size(vector_t *vec) {
   return vec->_size;
 }
 
-int vector_empty(Vector *vec) {
+static int vector_empty(vector_t *vec) {
   return vec->_size == 0;
 }
 
-void *vector_at(Vector *vec, int n) {
+static void *vector_at(vector_t *vec, int n) {
   assert(0 <= n && n < vec->_size);
 
   return vec->_elem + vec->_size_type * n;
 }
 
-void vector_insert(Vector *vec, int n, void *val) {
+static void vector_insert(vector_t *vec, int n, void *val) {
   assert(0 <= n && n <= vec->_size);
 
   vec->expand(vec);
@@ -76,7 +76,7 @@ void vector_insert(Vector *vec, int n, void *val) {
   vec->_size += 1;
 }
 
-void vector_remove(Vector *vec, int n) {
+static void vector_remove(vector_t *vec, int n) {
   assert(0 <= n && n < vec->_size);
 
   for (int i = vec->_size - 1; i > n; i--) {
@@ -89,21 +89,21 @@ void vector_remove(Vector *vec, int n) {
   vec->shrink(vec);
 }
 
-void vector_push_back(Vector *vec, void *val) {
+static void vector_push_back(vector_t *vec, void *val) {
   vec->insert(vec, vec->_size, val);
 }
 
-void vector_pop_back(Vector *vec) {
+static void vector_pop_back(vector_t *vec) {
   vec->remove(vec, vec->_size - 1);
 }
 
-void vector_clear(Vector *vec) {
+static void vector_clear(vector_t *vec) {
   while (!vec->empty(vec)) {
     vec->pop_back(vec);
   }
 }
 
-void vector_expand(Vector *vec) {
+static void vector_expand(vector_t *vec) {
   if (vec->_size < vec->_capacity) return;
   assert(vec->_capacity * 2 >= 0);
 
@@ -111,7 +111,7 @@ void vector_expand(Vector *vec) {
   vec->_elem = (void *)realloc(vec->_elem, vec->_capacity * vec->_size_type);
 }
 
-void vector_shrink(Vector *vec) {
+static void vector_shrink(vector_t *vec) {
   if (vec->_capacity < VECTOR_DEFAULT_CAPACITY * 2) return;
   if (vec->_capacity < vec->_size * 4) return;
 
