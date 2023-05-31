@@ -29,7 +29,7 @@ int main() {
 void test_int() {
   TEST_PRINT_FUNC();
 
-  Vector *vec = new_vector(sizeof(int));
+  vector_t *vec = new_vector(sizeof(int));
 
   vec->push_back(vec, &(int){1});
   vec->push_back(vec, &(int){2});
@@ -81,7 +81,7 @@ void test_struct() {
     int age;
   } People;
 
-  Vector *vec = new_vector(sizeof(People));
+  vector_t *vec = new_vector(sizeof(People));
   People kate = { "kate", 1 };
   People leo = { "Leo", 5 };
 
@@ -102,7 +102,7 @@ void test_struct() {
 void test_string() {
   TEST_PRINT_FUNC();
 
-  Vector *vec = new_vector(sizeof(char *));
+  vector_t *vec = new_vector(sizeof(char *));
 
   vec->push_back(vec, &(char *){"Hello"});
   vec->push_back(vec, &(char *){"World"});
@@ -118,7 +118,7 @@ void test_string() {
 void test_2d_array() {
   TEST_PRINT_FUNC();
 
-  Vector *vec = new_vector(sizeof(double **));
+  vector_t *vec = new_vector(sizeof(double **));
   double a[2][2] = {
     { 1, 2 },
     { 3, 4 }
@@ -154,7 +154,7 @@ void test_value_or_reference() {
   TEST_PRINT_FUNC();
 
   int a = 0;
-  Vector *vec_int = new_vector(sizeof(int));
+  vector_t *vec_int = new_vector(sizeof(int));
   vec_int->push_back(vec_int, &a);
   printf("int: \n");
   printf("%d\n", *(int *)vec_int->at(vec_int, 0));
@@ -165,7 +165,7 @@ void test_value_or_reference() {
   printf("\n");
 
   char *c = "Hello";
-  Vector *vec_str = new_vector(sizeof(char *));
+  vector_t *vec_str = new_vector(sizeof(char *));
   vec_str->push_back(vec_str, &c);
   printf("char *: \n");
   printf("%s\n", *(char **)vec_str->at(vec_str, 0));

@@ -1,16 +1,28 @@
-SRC_DIRS:=src
-INC_DIRS:=-I./src
+include test.mk
 
-CC:=gcc
-CFLAGS:=${INC_DIRS} -g -fsanitize=address -Wall -Werror
-SOURCES:=$(foreach dir, $(SRC_DIRS), $(wildcard $(dir)/*.c))
+SRC_DIR=src
+INC_DIR=src
 
-all: test
+CC=gcc
+CFLAGS=-I./${INC_DIR} -fsanitize=address -Wall -Wextra -Werror
+LDFLAGS=-shared
 
-test: test_vector
+TARGET_DIR=lib
+TARGET=${TARGET_DIR}/KiteSTL.so
 
-test_vector:
-	${CC} ${CFLAGS} test/test_vector.c ${SOURCES}
+SRCS=$(wildcard ${SRC_DIR}/*.c)
+OBJS=$(patsubst $(SRC_DIR)/%.c, $(TARGET_DIR)/%.o, $(SRCS))
+
+.PHONY: all clean
+
+all: ${TARGET}
+
+${TARGET}: ${OBJS}
+	${CC} ${CFLAGS} ${LDFLAGS} -o $@ $^
+
+${TARGET_DIR}/%.o: ${SRC_DIR}/%.c
+	@mkdir -p ${TARGET_DIR}
+	${CC} ${CFLAGS} -fPIC -c -o $@ $<
 
 clean:
-	rm -f *.out
+	rm -rf *.out ${TARGET_DIR}
