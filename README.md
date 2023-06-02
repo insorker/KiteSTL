@@ -2,7 +2,7 @@
 
 ## Usage
 
-Link the dynamic library "KiteSTL.so".
+Link the dynamic library "libKiteSTL.so".
 
 ## Build
 

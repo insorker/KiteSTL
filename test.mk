@@ -1,12 +1,4 @@
-SRC_DIR=src
-INC_DIR=src
-
-CC=gcc
-CFLAGS=-I./${INC_DIR} -fsanitize=address -Wall -Wextra -Werror
-
-SRCS=$(wildcard ${SRC_DIR}/*.c)
-
-.PHONY: test clean
+.PHONY: test
 
 test: test_vector
 

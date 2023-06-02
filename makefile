@@ -1,12 +1,12 @@
 SRC_DIR=src
-INC_DIR=src
+INC_DIR=inc
 
 CC=gcc
-CFLAGS=-I./${INC_DIR} -fsanitize=address -Wall -Wextra -Werror
+CFLAGS=-I./${INC_DIR} -fsanitize=address -Wall -Werror
 LDFLAGS=-shared
 
 TARGET_DIR=lib
-TARGET=${TARGET_DIR}/KiteSTL.so
+TARGET=${TARGET_DIR}/libKiteSTL.so
 
 SRCS=$(wildcard ${SRC_DIR}/*.c)
 OBJS=$(patsubst $(SRC_DIR)/%.c, $(TARGET_DIR)/%.o, $(SRCS))
