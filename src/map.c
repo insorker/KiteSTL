@@ -8,7 +8,7 @@ static void map_erase(map_t *,  void *key);
 static void *map_find(map_t *,  void *key);
 static void map_extract(map_t *, vector_t *keys, vector_t *vals);
 
-map_t *new_map(treap_utils_t key_utils, treap_utils_t val_utils)
+map_t *new_map(treap_emulate_t key, treap_emulate_t val)
 {
   map_t *map = (map_t *)malloc(sizeof(map_t));
 
@@ -19,7 +19,7 @@ map_t *new_map(treap_utils_t key_utils, treap_utils_t val_utils)
   map->find = map_find;
   map->extract = map_extract;
 
-  map->_tr = new_treap(key_utils, val_utils);
+  map->_tr = new_treap(key, val);
 
   return map;
 }

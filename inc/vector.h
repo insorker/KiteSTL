@@ -27,7 +27,6 @@ typedef struct vector_t {
   /* 	Clear content */
   void (*clear)(struct vector_t *);
 
-
 /** protected */
   /* Expand the capacity */
   void (*expand)(struct vector_t *);

@@ -1,7 +1,7 @@
 #ifndef TREAP_H
 #define TREAP_H
 
-#include "utils.h"
+#include "emulate.h"
 #include "vector.h"
 
 typedef struct treap_node_t {
@@ -12,11 +12,11 @@ typedef struct treap_node_t {
   int _size;
 } treap_node_t;
 
-typedef struct treap_utils_t {
-  UtilsCmp cmp;
-  UtilsClone clone;
-  UtilsFree free;
-} treap_utils_t;
+typedef struct treap_emulate_t {
+  emulate_cmp_t cmp;
+  emulate_clone_t clone;
+  emulate_free_t free;
+} treap_emulate_t;
 
 typedef struct treap_t {
 /** public **/
@@ -49,23 +49,17 @@ typedef struct treap_t {
   void (*zag)(struct treap_t *, treap_node_t **p);
 
 /** private **/
-  UtilsCmp key_cmp;
-  UtilsClone key_clone;
-  UtilsClone val_clone;
-  UtilsFree key_free;
-  UtilsFree val_free;
-
+  treap_emulate_t _emulate_key;
+  treap_emulate_t _emulate_val;
   treap_node_t *_root;
 } treap_t;
 
 treap_node_t *new_treap_node(void *key, void *val);
 void free_treap_node(treap_t *, treap_node_t *);
-treap_t *new_treap(treap_utils_t key_utils, treap_utils_t val_utils);
+treap_t *new_treap(treap_emulate_t key, treap_emulate_t val);
 void free_treap(treap_t *);
 
-extern struct treap_utils_bundle {
-  treap_utils_t tu_int;
-  treap_utils_t tu_char;
-} treap_utils;
+extern treap_emulate_t treap_emulate_int;
+extern treap_emulate_t treap_emulate_str;
 
 #endif

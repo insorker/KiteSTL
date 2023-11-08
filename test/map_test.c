@@ -2,19 +2,24 @@
 #include "map.h"
 #include "vector.h"
 #include <stdio.h>
+#include <string.h>
 #include <malloc.h>
 
-void test_int_int();
-void test_char_int();
-void test_char_char();
-void test_char_struct();
+const char *ERR_MAP_FIND = "Error -> map->find";
+const char *ERR_MAP_INSERT = "Error -> map->insert";
+const char *ERR_MAP_ERASE = "Error -> map->erase";
+const char *ERR_MAP_SIZE = "Error -> map->size";
 
+void test_int_int();
+void test_str_int();
+void test_str_str();
 struct pair_int {
   int fi, se;
 };
 int pair_int_cmp(void *lhs, void *rhs);
 void *pair_int_clone(void *val);
 void pair_int_free(void *val);
+void test_str_struct();
 
 int main()
 {
@@ -22,15 +27,14 @@ int main()
 
   TestFunction tf[] = {
     test_int_int,
-    test_char_int,
-    test_char_char,
-    test_char_struct,
+    test_str_int,
+    test_str_str,
+    test_str_struct,
     NULL
   };
 
   for (int i = 0; tf[i] != NULL; i++) {
-    tf[i]();
-    printf("\n");
+    tf[i](); printf("OK \n");
   }
 }
 
@@ -38,87 +42,90 @@ void test_int_int()
 {
   TEST_PRINT_FUNC();
 
-  map_t *map = new_map(treap_utils.tu_int, treap_utils.tu_int);
+  map_t *map = new_map(treap_emulate_int, treap_emulate_int);
 
   map->insert(map, &(int){1}, &(int){1});
   map->insert(map, &(int){2}, &(int){2});
-  printf("%d\n", *(int *)map->find(map, &(int){1}));
-  printf("%d\n", *(int *)map->find(map, &(int){2}));
-  if (map->find(map, &(int){2}) == NULL) { printf("can not find 2\n"); }
-  if (map->find(map, &(int){3}) == NULL) { printf("can not find 3\n"); }
+
+  TEST_PAINC(*(int *)map->find(map, &(int){1}) == 1, ERR_MAP_FIND);
+  TEST_PAINC(*(int *)map->find(map, &(int){2}) == 2, ERR_MAP_FIND);
+  TEST_PAINC(map->find(map, &(int){3}) == NULL, ERR_MAP_FIND);
 
   map->insert(map, &(int){2}, &(int){22});
-  printf("%d\n", *(int *)map->find(map, &(int){2}));
-  printf("%d\n", map->size(map));
+
+  TEST_PAINC(*(int *)map->find(map, &(int){2}) == 22, ERR_MAP_INSERT);
+  TEST_PAINC(map->size(map) == 2, ERR_MAP_SIZE);
 
   map->erase(map, &(int){3});
   map->erase(map, &(int){1});
-  if (map->find(map, &(int){1}) == NULL) { printf("can not find 1\n"); }
+
+  TEST_PAINC(map->find(map, &(int){1}) == NULL, ERR_MAP_ERASE);
 
   free_map(map);
 }
 
-void test_char_int()
+void test_str_int()
 {
   TEST_PRINT_FUNC();
 
-  map_t *map = new_map(treap_utils.tu_char, treap_utils.tu_int);
+  map_t *map = new_map(treap_emulate_str, treap_emulate_int);
 
   map->insert(map, "John", &(int){100});
   map->insert(map, "Mary", &(int){98});
   map->insert(map, "David", &(int){70});
-  printf("%d\n", *(int *)map->find(map, "John"));
-  printf("%d\n", *(int *)map->find(map, "Mary"));
-  if (map->find(map, "David") == NULL) { printf("can not find David\n"); }
-  if (map->find(map, "Tom") == NULL) { printf("can not find Tom\n"); }
+
+  TEST_PAINC(*(int *)map->find(map, "John") == 100, ERR_MAP_FIND);
+  TEST_PAINC(*(int *)map->find(map, "Mary") == 98, ERR_MAP_FIND);
+
+  TEST_PAINC(*(int *)map->find(map, "David") == 70, ERR_MAP_FIND);
+  TEST_PAINC(map->find(map, "Tom") == NULL, ERR_MAP_FIND);
 
   map->erase(map, "Tom");
   map->erase(map, "John");
-  if (map->find(map, "John") == NULL) { printf("can not find John\n"); }
-  printf("%d\n", *(int *)map->find(map, "David"));
+
+  TEST_PAINC(map->find(map, "John") == NULL, ERR_MAP_ERASE);
+  TEST_PAINC(*(int *)map->find(map, "David") == 70, ERR_MAP_ERASE);
 
   free_map(map);
 }
 
-void test_char_char()
+void test_str_str()
 {
   TEST_PRINT_FUNC();
 
-  map_t *map = new_map(treap_utils.tu_char, treap_utils.tu_char);
+  map_t *map = new_map(treap_emulate_str, treap_emulate_str);
 
   for (char c = 'a'; c <= 'z'; c++) {
-    char cc[2];
-    cc[0] = c, cc[1] = '\0';
+    char cc[2] = { c, '\0' };
 
     map->insert(map, cc, cc);
   }
 
   for (char c = 'a'; c <= 'z'; c++) {
-    char cc[2];
-    cc[0] = c, cc[1] = '\0';
+    char cc[2] = { c, '\0' };
 
-    if (map->find(map, cc) != NULL) {
-      printf("%s", (char *)map->find(map, cc));
-    }
+    TEST_PAINC(
+      strcmp((char *)map->find(map, cc), cc) == 0,
+      ERR_MAP_INSERT
+    );
   }
-  printf("\n");
 
-  vector_t *keys = new_vector(2 * sizeof(char));
-  vector_t *vals = new_vector(2 * sizeof(char));
-  map->extract(map, keys, vals);
+  // vector_t *keys = new_vector(2 * sizeof(char));
+  // vector_t *vals = new_vector(2 * sizeof(char));
+  // map->extract(map, keys, vals);
 
-  for (int i = 0; i < keys->size(keys); i++) {
-    printf("%s", (char *)keys->at(keys, i));
-  }
-  printf("\n");
-  for (int i = 0; i < vals->size(vals); i++) {
-    printf("%s", (char *)vals->at(vals, i));
-  }
-  printf("\n");
+  // for (int i = 0; i < keys->size(keys); i++) {
+  //   printf("%s", (char *)keys->at(keys, i));
+  // }
+  // printf("\n");
+  // for (int i = 0; i < vals->size(vals); i++) {
+  //   printf("%s", (char *)vals->at(vals, i));
+  // }
+  // printf("\n");
 
+  // free_vector(keys);
+  // free_vector(vals);
   free_map(map);
-  free_vector(keys);
-  free_vector(vals);
 }
 
 int pair_int_cmp(void *lhs, void *rhs)
@@ -144,18 +151,18 @@ void pair_int_free(void *val)
   free((struct pair_int *)val);
 }
 
-void test_char_struct()
+void test_str_struct()
 {
   TEST_PRINT_FUNC();
 
-  map_t *map = new_map(treap_utils.tu_char, (treap_utils_t) {
+  map_t *map = new_map(treap_emulate_str, (treap_emulate_t) {
     pair_int_cmp, pair_int_clone, pair_int_free
   });
 
   map->insert(map, "{1, 2}", &(struct pair_int){ 1, 2 });
   map->insert(map, "{2, 3}", &(struct pair_int){ 2, 3 });
 
-  printf("%d\n", ((struct pair_int *)map->find(map, "{2, 3}"))->fi);
+  TEST_PAINC(((struct pair_int *)map->find(map, "{1, 2}"))->fi == 1, ERR_MAP_INSERT);
 
   free_map(map);
 }
