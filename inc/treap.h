@@ -41,8 +41,9 @@ void free_treap_node(treap_t *, treap_node_t *);
 treap_t *new_treap(treap_utils_t key_utils, treap_utils_t val_utils);
 void free_treap(treap_t *);
 
-extern struct {
+extern struct treap_utils_bundle {
   treap_utils_t tu_int;
+  treap_utils_t tu_char;
 } treap_utils;
 
 #endif

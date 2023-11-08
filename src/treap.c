@@ -1,6 +1,7 @@
 #include "treap.h"
 #include <malloc.h>
 #include <stdlib.h>
+#include <string.h>
 
 static void treap_insert(treap_t *, treap_node_t **p, void *key, void *val);
 static void treap_erase(treap_t *, treap_node_t **p, void *key);
@@ -25,14 +26,13 @@ void free_treap_node(treap_t *tr, treap_node_t *p)
   tr->key_free(p->_key);
   tr->val_free(p->_val);
 
-  if (!p->_le) {
+  if (p->_le) {
     free_treap_node(tr, p->_le);
-    free(p->_le);
   }
-  if (!p->_ri) {
+  if (p->_ri) {
     free_treap_node(tr, p->_ri);
-    free(p->_ri);
   }
+  free(p);
 }
 
 treap_t *new_treap(treap_utils_t key_utils, treap_utils_t val_utils)
@@ -65,7 +65,9 @@ void free_treap(treap_t *tr)
 static void treap_insert(treap_t *tr, treap_node_t **p, void *key, void *val)
 {
   if (!(*p)) {
-    (*p) = new_treap_node(key, val);
+    (*p) = new_treap_node(
+      tr->key_clone(key),
+      tr->val_clone(val));
   }
   else if (tr->key_cmp((*p)->_key, key) == 0) {
     tr->key_free((*p)->_key);
@@ -104,8 +106,7 @@ static void treap_erase(treap_t *tr, treap_node_t **p, void *key)
       }
     }
     else {
-      tr->key_free((*p)->_key);
-      tr->val_free((*p)->_val);
+      free_treap_node(tr, *p);
       *p = NULL;
     }
   }
@@ -149,7 +150,7 @@ static int treap_utils_int_cmp(void *lhs, void *rhs)
   int ri = *(int *)rhs;
 
   if (le == ri) return 0;
-  return le > ri ? 1 : 0;
+  return le > ri ? 1 : -1;
 }
 
 static void *treap_utils_int_clone(void *val)
@@ -164,9 +165,32 @@ static void treap_utils_int_free(void *val)
   free((int *)val);
 }
 
-// struct {
-//   treap_utils_t tu_int;
-//   treap_utils_t tu_char;
-// } treap_utils = {
-//   { treap_utils}
-// };
+static int treap_utils_char_cmp(void *lhs, void *rhs)
+{
+  char *le = (char *)lhs;
+  char *ri = (char *)rhs;
+
+  return strcmp(le, ri);
+}
+
+static void *treap_utils_char_clone(void *val)
+{
+  int sz = 0;
+  while (((char *)val)[sz++]);
+
+  char *val_copy = (char *)malloc(sz * sizeof(char));
+  strcpy(val_copy, val);
+  val_copy[sz - 1] = '\0';
+
+  return val_copy;
+}
+
+static void treap_utils_char_free(void *val)
+{
+  free((char *)val);
+}
+
+struct treap_utils_bundle treap_utils = {
+  { treap_utils_int_cmp, treap_utils_int_clone, treap_utils_int_free },
+  { treap_utils_char_cmp, treap_utils_char_clone, treap_utils_char_free }
+};
