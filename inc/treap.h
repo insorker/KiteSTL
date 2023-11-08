@@ -18,12 +18,20 @@ typedef struct treap_utils_t {
 
 typedef struct treap_t {
 /** public **/
+  /* Insert Elements */
   void (*insert)(struct treap_t *, treap_node_t **p, void *key, void *val);
+
+  /* Erase Elements */
   void (*erase)(struct treap_t *, treap_node_t **p, void *key);
+
+  /* Get Element */
   void *(*find)(struct treap_t *, treap_node_t **p, void *key);
 
 /** protected **/
+  /* rotate left */
   void (*zig)(struct treap_t *, treap_node_t **p);
+
+  /* rotate right */
   void (*zag)(struct treap_t *, treap_node_t **p);
 
 /** private **/

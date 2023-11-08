@@ -1,10 +1,19 @@
 #include "test.h"
 #include "map.h"
 #include <stdio.h>
+#include <malloc.h>
 
 void test_int_int();
 void test_char_int();
 void test_char_char();
+void test_char_struct();
+
+struct pair_int {
+  int fi, se;
+};
+int pair_int_cmp(void *lhs, void *rhs);
+void *pair_int_clone(void *val);
+void pair_int_free(void *val);
 
 int main()
 {
@@ -14,6 +23,7 @@ int main()
     test_int_int,
     test_char_int,
     test_char_char,
+    test_char_struct,
     NULL
   };
 
@@ -89,6 +99,45 @@ void test_char_char()
       printf("%s", (char *)map->find(map, cc));
     }
   }
+
+  free_map(map);
+}
+
+int pair_int_cmp(void *lhs, void *rhs)
+{
+  struct pair_int *le = (struct pair_int *)lhs;
+  struct pair_int *ri = (struct pair_int *)rhs;
+
+  if (le->fi == ri->fi && le->se == ri->se) return 0;
+  return le->fi > ri->fi ? 1 : -1;
+}
+
+void *pair_int_clone(void *val)
+{
+  struct pair_int *val_copy = (struct pair_int *)malloc(sizeof(struct pair_int));
+
+  val_copy->fi = ((struct pair_int *)val)->fi;
+  val_copy->se = ((struct pair_int *)val)->se;
+
+  return val_copy;
+}
+void pair_int_free(void *val)
+{
+  free((struct pair_int *)val);
+}
+
+void test_char_struct()
+{
+  TEST_PRINT_FUNC();
+
+  map_t *map = new_map(treap_utils.tu_char, (treap_utils_t) {
+    pair_int_cmp, pair_int_clone, pair_int_free
+  });
+
+  map->insert(map, "{1, 2}", &(struct pair_int){ 1, 2 });
+  map->insert(map, "{2, 3}", &(struct pair_int){ 2, 3 });
+
+  printf("%d\n", ((struct pair_int *)map->find(map, "{2, 3}"))->fi);
 
   free_map(map);
 }

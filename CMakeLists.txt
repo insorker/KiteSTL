@@ -1,6 +1,5 @@
 project(KiteSTL)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -Wall -Werror -g")
-# add_compile_options()
 
 ####################
 # include
