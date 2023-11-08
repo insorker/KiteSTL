@@ -28,6 +28,8 @@ treap_node_t *new_treap_node(void *key, void *val)
 
 void free_treap_node(treap_t *tr, treap_node_t *p)
 {
+  if (!p) return;
+
   tr->key_free(p->_key);
   tr->val_free(p->_val);
 
