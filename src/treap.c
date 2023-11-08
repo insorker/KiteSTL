@@ -8,6 +8,8 @@ static int treap_size(treap_t *);
 static void treap_insert(treap_t *, treap_node_t **p, void *key, void *val);
 static void treap_erase(treap_t *, treap_node_t **p, void *key);
 static void *treap_find(treap_t *, treap_node_t **p, void *key);
+static void treap_extract(treap_t *, treap_node_t **p, vector_t *keys, vector_t *vals);
+
 static void treap_pushup(treap_t *, treap_node_t **p);
 static void treap_zig(treap_t *, treap_node_t **p);
 static void treap_zag(treap_t *, treap_node_t **p);
@@ -46,6 +48,7 @@ treap_t *new_treap(treap_utils_t key_utils, treap_utils_t val_utils)
   tr->insert = treap_insert;
   tr->erase = treap_erase;
   tr->find = treap_find;
+  tr->extract = treap_extract;
 
   tr->key_cmp = key_utils.cmp;
   tr->key_clone = key_utils.clone;
@@ -145,6 +148,16 @@ static void *treap_find(treap_t *tr, treap_node_t **p, void *key)
   else {
     return tr->find(tr, &(*p)->_ri, key);
   }
+}
+
+static void treap_extract(treap_t *tr, treap_node_t **p, vector_t *keys, vector_t *vals)
+{
+  if (!(*p)) return;
+
+  if ((*p)->_le) treap_extract(tr, &(*p)->_le, keys, vals);
+  keys->push_back(keys, (*p)->_key);
+  vals->push_back(vals, (*p)->_val);
+  if ((*p)->_ri) treap_extract(tr, &(*p)->_ri, keys, vals);
 }
 
 static void treap_pushup(treap_t *tr, treap_node_t **p)

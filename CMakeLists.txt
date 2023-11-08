@@ -24,5 +24,5 @@ target_link_libraries(vector_test PRIVATE vector)
 add_test(NAME vector_test COMMAND vector_test)
 
 add_executable(map_test test/map_test.c)
-target_link_libraries(map_test PRIVATE map treap)
+target_link_libraries(map_test PRIVATE map treap vector)
 add_test(NAME map_test COMMAND map_test)

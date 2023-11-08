@@ -17,6 +17,9 @@ typedef struct map_t {
   /* Get Element */
   void *(*find)(struct map_t *, void *key);
 
+  /* Extract All */
+  void (*extract)(struct map_t *, vector_t *keys, vector_t *vals);
+
 /** private **/
   treap_t *_tr;
 } map_t;

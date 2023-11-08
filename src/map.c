@@ -5,6 +5,7 @@ static int map_size(map_t *);
 static void map_insert(map_t *,  void *key, void *val);
 static void map_erase(map_t *,  void *key);
 static void *map_find(map_t *,  void *key);
+static void map_extract(map_t *, vector_t *keys, vector_t *vals);
 
 map_t *new_map(treap_utils_t key_utils, treap_utils_t val_utils)
 {
@@ -14,6 +15,7 @@ map_t *new_map(treap_utils_t key_utils, treap_utils_t val_utils)
   map->insert = map_insert;
   map->erase = map_erase;
   map->find = map_find;
+  map->extract = map_extract;
 
   map->_tr = new_treap(key_utils, val_utils);
 
@@ -44,4 +46,9 @@ static void map_erase(map_t *map,  void *key)
 static void *map_find(map_t *map,  void *key)
 {
   return map->_tr->find(map->_tr, &map->_tr->_root, key);
+}
+
+static void map_extract(map_t *map, vector_t *keys, vector_t *vals)
+{
+  map->_tr->extract(map->_tr, &map->_tr->_root, keys, vals);
 }

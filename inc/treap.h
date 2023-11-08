@@ -2,6 +2,7 @@
 #define TREAP_H
 
 #include "utils.h"
+#include "vector.h"
 
 typedef struct treap_node_t {
 /** public **/
@@ -30,6 +31,9 @@ typedef struct treap_t {
 
   /* Get Element */
   void *(*find)(struct treap_t *, treap_node_t **p, void *key);
+
+  /* Extract All */
+  void (*extract)(struct treap_t *, treap_node_t **p, vector_t *keys, vector_t *vals);
 
 /** protected **/
   /* push up */
