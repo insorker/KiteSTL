@@ -5,6 +5,9 @@
 
 typedef struct map_t {
 /** public **/
+  /* Return container size */
+  int (*size)(struct map_t *);
+
   /* Insert Elements */
   void (*insert)(struct map_t *,  void *key, void *val);
 

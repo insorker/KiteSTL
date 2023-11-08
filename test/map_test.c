@@ -48,6 +48,7 @@ void test_int_int()
 
   map->insert(map, &(int){2}, &(int){22});
   printf("%d\n", *(int *)map->find(map, &(int){2}));
+  printf("%d\n", map->size(map));
 
   map->erase(map, &(int){3});
   map->erase(map, &(int){1});
@@ -99,6 +100,7 @@ void test_char_char()
       printf("%s", (char *)map->find(map, cc));
     }
   }
+  printf("\n");
 
   free_map(map);
 }

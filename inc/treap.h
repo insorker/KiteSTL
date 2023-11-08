@@ -8,6 +8,7 @@ typedef struct treap_node_t {
   struct treap_node_t *_le, *_ri;
   void *_key, *_val;
   int _rand;
+  int _size;
 } treap_node_t;
 
 typedef struct treap_utils_t {
@@ -18,6 +19,9 @@ typedef struct treap_utils_t {
 
 typedef struct treap_t {
 /** public **/
+  /* Return container size */
+  int (*size)(struct treap_t *);
+
   /* Insert Elements */
   void (*insert)(struct treap_t *, treap_node_t **p, void *key, void *val);
 
@@ -28,6 +32,9 @@ typedef struct treap_t {
   void *(*find)(struct treap_t *, treap_node_t **p, void *key);
 
 /** protected **/
+  /* push up */
+  void (*pushup)(struct treap_t *, treap_node_t **p);
+
   /* rotate left */
   void (*zig)(struct treap_t *, treap_node_t **p);
 
