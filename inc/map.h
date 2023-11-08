@@ -5,8 +5,13 @@
 
 typedef struct map_t {
 /** public **/
+  /* Insert Elements */
   void (*insert)(struct map_t *,  void *key, void *val);
+
+  /* Erase Elements */
   void (*erase)(struct map_t *, void *key);
+
+  /* Get Element */
   void *(*find)(struct map_t *, void *key);
 
 /** private **/
