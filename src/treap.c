@@ -5,6 +5,7 @@
 #include <assert.h>
 
 static int treap_size(treap_t *);
+static void treap_clear(treap_t *);
 static void treap_insert(treap_t *, treap_node_t **p, void *key, void *val);
 static void treap_erase(treap_t *, treap_node_t **p, void *key);
 static void *treap_find(treap_t *, treap_node_t **p, void *key);
@@ -47,6 +48,7 @@ treap_t *new_treap(treap_utils_t key_utils, treap_utils_t val_utils)
   treap_t *tr = (treap_t *)malloc(sizeof(treap_t));
 
   tr->size = treap_size;
+  tr->clear = treap_clear;
   tr->insert = treap_insert;
   tr->erase = treap_erase;
   tr->find = treap_find;
@@ -76,6 +78,12 @@ void free_treap(treap_t *tr)
 static int treap_size(treap_t *tr)
 {
   return tr->_root->_size;
+}
+
+static void treap_clear(treap_t *tr)
+{
+  free_treap_node(tr, tr->_root);
+  tr->_root = NULL;
 }
 
 static void treap_insert(treap_t *tr, treap_node_t **p, void *key, void *val)

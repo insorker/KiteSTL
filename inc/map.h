@@ -8,6 +8,9 @@ typedef struct map_t {
   /* Return container size */
   int (*size)(struct map_t *);
 
+  /* 	Clear content */
+  void (*clear)(struct map_t *);
+
   /* Insert Elements */
   void (*insert)(struct map_t *,  void *key, void *val);
 

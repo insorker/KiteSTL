@@ -23,6 +23,9 @@ typedef struct treap_t {
   /* Return container size */
   int (*size)(struct treap_t *);
 
+  /* 	Clear content */
+  void (*clear)(struct treap_t *);
+
   /* Insert Elements */
   void (*insert)(struct treap_t *, treap_node_t **p, void *key, void *val);
 
