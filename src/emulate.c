@@ -11,7 +11,6 @@ void *emulate_clone_int(void *val)
 
 void emulate_free_int(void *val)
 {
-  // free((int *)val);
 }
 
 int emulate_cmp_int(void *lhs, void *rhs)
@@ -35,8 +34,6 @@ void *emulate_clone_pchar(void *val)
   // deep copy end
 
   *val_clone = content_clone;
-  // memcpy(val_clone, (char **)val, sizeof(char *));
-  // *val_clone = *(char **)val;
 
   return val_clone;
 }
@@ -44,7 +41,6 @@ void *emulate_clone_pchar(void *val)
 void emulate_free_pchar(void *val)
 {
   free(*(char **)val);
-  // free((char **)val);
 }
 
 int emulate_cmp_pchar(void *lhs, void *rhs)

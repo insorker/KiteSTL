@@ -28,7 +28,7 @@ typedef void (*emulate_free_t)(void *val);
  */
 typedef int (*emulate_cmp_t)(void *lhs, void *rhs);
 
-
+/* (int) */
 void *emulate_clone_int(void *val);
 void emulate_free_int(void *val);
 int emulate_cmp_int(void *lhs, void *rhs);
