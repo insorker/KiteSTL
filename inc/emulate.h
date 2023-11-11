@@ -1,18 +1,6 @@
 #ifndef EMULATE_H
 #define EMULATE_H
 
-#include <stdio.h>
-
-#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-// >= c11
-#define eml(x) \
-  _Generic((x), \
-    int:      &(int){x},    \
-    char *:   &(char *){x}, \
-    default:  (void *)0     \
-  )
-#endif
-
 /**
  * @brief Emulate copy-constructor in C++.
  * 

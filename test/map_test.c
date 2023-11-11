@@ -13,9 +13,6 @@ const char *ERR_MAP_SIZE = "Error -> map->size";
 void test_int_int();
 void test_str_int();
 void test_str_str();
-struct pair_int {
-  int fi, se;
-};
 int pair_int_cmp(void *lhs, void *rhs);
 void *pair_int_clone(void *val);
 void pair_int_free(void *val);
@@ -29,7 +26,7 @@ int main()
     test_int_int,
     test_str_int,
     test_str_str,
-    // test_str_struct,
+    test_str_struct,
     NULL
   };
 
@@ -128,6 +125,10 @@ void test_str_str()
   free_map(map);
 }
 
+struct pair_int {
+  int fi, se;
+};
+
 int pair_int_cmp(void *lhs, void *rhs)
 {
   struct pair_int *le = (struct pair_int *)lhs;
@@ -148,7 +149,6 @@ void *pair_int_clone(void *val)
 }
 void pair_int_free(void *val)
 {
-  free((struct pair_int *)val);
 }
 
 void test_str_struct()
@@ -159,10 +159,10 @@ void test_str_struct()
     pair_int_clone, pair_int_free, pair_int_cmp
   });
 
-  map->insert(map, "{1, 2}", &(struct pair_int){ 1, 2 });
-  map->insert(map, "{2, 3}", &(struct pair_int){ 2, 3 });
+  map->insert(map, &(char *){"{1, 2}"}, &(struct pair_int){ 1, 2 });
+  map->insert(map, &(char *){"{2, 3}"}, &(struct pair_int){ 2, 3 });
 
-  TEST_ASSERT(((struct pair_int *)map->find(map, "{1, 2}"))->fi == 1, ERR_MAP_INSERT);
+  TEST_ASSERT(((struct pair_int *)map->find(map, &(char *){"{1, 2}"}))->fi == 1, ERR_MAP_INSERT);
 
   free_map(map);
 }

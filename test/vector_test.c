@@ -2,6 +2,7 @@
 #include "vector.h"
 #include <stdio.h>
 #include <string.h>
+#include <malloc.h>
 
 const char *ERR_VECTOR_FIND = "Error -> vector->find";
 const char *ERR_VECTOR_INSERT = "Error -> vector->insert";
@@ -10,9 +11,7 @@ const char *ERR_VECTOR_SIZE = "Error -> vector->size";
 
 void test_int();
 void test_str();
-// void test_struct();
-// void test_2d_array();
-// void test_value_or_reference();
+void test_struct();
 
 int main() {
   TEST_PRINT_FILE();
@@ -20,9 +19,7 @@ int main() {
   TestFunction tf[] = {
     test_int,
     test_str,
-    // test_struct,
-    // test_2d_array,
-    // test_value_or_reference,
+    test_struct,
     NULL
   };
 
@@ -69,94 +66,53 @@ void test_str() {
   vec->push_back(vec, &(char *){"Hello"});
   TEST_ASSERT(strcmp(*(char **)vec->at(vec, 0), "Hello") == 0, ERR_VECTOR_INSERT);
   vec->push_back(vec, &(char *){"World"});
-  TEST_ASSERT(strcmp(*(char **)vec->at(vec, 1), "Hello") == 0, ERR_VECTOR_INSERT);
+  TEST_ASSERT(strcmp(*(char **)vec->at(vec, 1), "World") == 0, ERR_VECTOR_INSERT);
 
   free_vector(vec);
 }
 
-// void test_struct() {
-//   TEST_PRINT_FUNC();
+typedef struct people_t {
+  char name[10];
+  int age;
+} people_t;
 
-//   typedef struct People {
-//     char name[10];
-//     int age;
-//   } People;
+void *emulate_clone_people(void *val)
+{
+  people_t *val_copy = (people_t *)malloc(sizeof(people_t));
+  memcpy(val_copy, val, sizeof(people_t));
 
-//   vector_t *vec = new_vector(sizeof(People));
-//   People kate = { "kate", 1 };
-//   People leo = { "Leo", 5 };
+  return val_copy;
+}
 
-//   vec->push_back(vec, &(People){ "Max", 10 });
-//   vec->push_back(vec, &(People){ "Ben", 43 });
-//   vec->push_back(vec, &(People){ "Tom", 18 });
-//   vec->push_back(vec, &kate);
-//   vec->push_back(vec, &leo);
+void emulate_free_people(void *val)
+{
+}
 
-//   for (int i = 0; i < vec->size(vec); i++) {
-//     People people = *(People *)vec->at(vec, i);
-//     printf("name: %s\tage:%d\n", people.name, people.age);
-//   }
+void test_struct() {
+  TEST_PRINT_FUNC();
 
-//   free_vector(vec);
-// }
+  vector_t *vec = new_vector((vector_emulate_t){
+    sizeof(people_t), emulate_clone_people, emulate_free_people
+  });
+  people_t people[] = {
+    { "John", 1 },
+    { "Mary", 5 },
+    { "Max", 10 },
+    { "Ben", 43 },
+    { "Tom", 18 }
+  };
 
-// void test_2d_array() {
-//   TEST_PRINT_FUNC();
+  vec->push_back(vec, &people[0]);
+  vec->push_back(vec, &people[1]);
+  vec->push_back(vec, &(people_t){ "Max", 10 });
+  vec->push_back(vec, &(people_t){ "Ben", 43 });
+  vec->push_back(vec, &(people_t){ "Tom", 18 });
 
-//   vector_t *vec = new_vector(sizeof(double **));
-//   double a[2][2] = {
-//     { 1, 2 },
-//     { 3, 4 }
-//   };
-//   double b[3][3] = {
-//     { 1, 3, 5 },
-//     { 1, 4, 9 },
-//     { 1, 1, 2 }
-//   };
+  for (int i = 0; i < vec->size(vec); i++) {
+    people_t p = *(people_t *)vec->at(vec, i);
+    TEST_ASSERT(strcmp(p.name, people[i].name) == 0, ERR_VECTOR_INSERT);
+    TEST_ASSERT(p.age == people[i].age, ERR_VECTOR_INSERT);
+  }
 
-//   vec->push_back(vec, &(double(*)[2]){a});
-//   vec->push_back(vec, &(void *){b});
-
-//   double (*arr_a)[2] = *(double(**)[2])vec->at(vec, 0);
-//   for (int j = 0; j < 2; j++) {
-//     for (int k = 0; k < 2; k++) {
-//       printf("%f ", arr_a[j][k]);
-//     }
-//     printf("\n");
-//   }
-//   double (*arr_b)[3] = *(void * *)vec->at(vec, 1);
-//   for (int j = 0; j < 3; j++) {
-//     for (int k = 0; k < 3; k++) {
-//       printf("%f ", arr_b[j][k]);
-//     }
-//     printf("\n");
-//   }
-
-//   free_vector(vec);
-// }
-
-// void test_value_or_reference() {
-//   TEST_PRINT_FUNC();
-
-//   int a = 0;
-//   vector_t *vec_int = new_vector(sizeof(int));
-//   vec_int->push_back(vec_int, &a);
-//   printf("int: \n");
-//   printf("%d\n", *(int *)vec_int->at(vec_int, 0));
-//   printf("origin address: %p\n", &a);
-//   printf("vector address: %p\n", (int *)vec_int->at(vec_int, 0));
-//   free_vector(vec_int);
-
-//   printf("\n");
-
-//   char *c = "Hello";
-//   vector_t *vec_str = new_vector(sizeof(char *));
-//   vec_str->push_back(vec_str, &c);
-//   printf("char *: \n");
-//   printf("%s\n", *(char **)vec_str->at(vec_str, 0));
-//   printf("origin address: %p\n", &c);
-//   printf("vector address: %p\n", (char **)vec_str->at(vec_str, 0));
-//   printf("string origin address: %p\n", c);
-//   printf("string vector address: %p\n", *(char **)vec_str->at(vec_str, 0));
-//   free_vector(vec_str);
-// }
+  free_vector(vec);
+}
