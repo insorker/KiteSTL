@@ -58,6 +58,14 @@ void test_int_int()
 
   TEST_ASSERT(map->find(map, &(int){1}) == NULL, ERR_MAP_ERASE);
 
+  map->clear(map);
+  TEST_ASSERT(map->size(map) == 0, ERR_MAP_SIZE);
+
+  for (int i = 0; i < 100; i++) {
+    map->insert(map, &(int){i}, &(int){i});
+    TEST_ASSERT(map->size(map) == i + 1, ERR_MAP_SIZE);
+  }
+
   free_map(map);
 }
 
@@ -70,6 +78,7 @@ void test_str_int()
   map->insert(map, &(char *){"John"}, &(int){100});
   map->insert(map, &(char *){"Mary"}, &(int){98});
   map->insert(map, &(char *){"David"}, &(int){70});
+  TEST_ASSERT(map->size(map) == 3, ERR_MAP_SIZE);
 
   TEST_ASSERT(*(int *)map->find(map, &(char *){"John"}) == 100, ERR_MAP_FIND);
   TEST_ASSERT(*(int *)map->find(map, &(char *){"Mary"}) == 98, ERR_MAP_FIND);
@@ -79,6 +88,7 @@ void test_str_int()
 
   map->erase(map, &(char *){"Tom"});
   map->erase(map, &(char *){"John"});
+  TEST_ASSERT(map->size(map) == 2, ERR_MAP_SIZE);
 
   TEST_ASSERT(map->find(map, &(char *){"John"}) == NULL, ERR_MAP_ERASE);
   TEST_ASSERT(*(int *)map->find(map, &(char *){"David"}) == 70, ERR_MAP_ERASE);
@@ -106,6 +116,7 @@ void test_str_str()
       ERR_MAP_INSERT
     );
   }
+  TEST_ASSERT(map->size(map) == 26, ERR_MAP_SIZE);
 
   vector_t *keys = new_vector(vector_emulate_pchar);
   vector_t *vals = new_vector(vector_emulate_pchar);

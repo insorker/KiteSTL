@@ -73,6 +73,7 @@ void free_treap(treap_t *tr)
 
 static int treap_size(treap_t *tr)
 {
+  if (!tr->_root) return 0;
   return tr->_root->_size;
 }
 
@@ -182,6 +183,7 @@ static void treap_zig(treap_t *tr, treap_node_t **p)
 {
   treap_node_t *q = (*p)->_le;
   (*p)->_le = q->_ri, q->_ri = (*p), (*p) = q;
+  tr->pushup(tr, &(*p)->_ri);
   tr->pushup(tr, p);
 }
 
@@ -189,6 +191,7 @@ static void treap_zag(treap_t *tr, treap_node_t **p)
 {
   treap_node_t *q = (*p)->_ri;
   (*p)->_ri = q->_le, q->_le = (*p), (*p) = q;
+  tr->pushup(tr, &(*p)->_le);
   tr->pushup(tr, p);
 }
 
