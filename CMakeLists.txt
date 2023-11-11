@@ -21,7 +21,7 @@ enable_testing()
 
 # test vector
 add_executable(vector_test test/vector_test.c)
-target_link_libraries(vector_test PRIVATE vector)
+target_link_libraries(vector_test PRIVATE vector emulate)
 add_test(NAME vector_test COMMAND vector_test)
 
 add_executable(map_test test/map_test.c)

@@ -33,7 +33,9 @@ void free_treap_node(treap_t *tr, treap_node_t *p)
   if (!p) return;
 
   tr->_emulate_key.free(p->_key);
+  free(p->_key);
   tr->_emulate_val.free(p->_val);
+  free(p->_val);
 
   if (p->_le) free_treap_node(tr, p->_le);
   if (p->_ri) free_treap_node(tr, p->_ri);
@@ -41,7 +43,7 @@ void free_treap_node(treap_t *tr, treap_node_t *p)
   free(p);
 }
 
-treap_t *new_treap(treap_emulate_t emulate_key, treap_emulate_t emulate_val)
+treap_t *new_treap(treap_emulate_key_t emulate_key, treap_emulate_val_t emulate_val)
 {
   treap_t *tr = (treap_t *)malloc(sizeof(treap_t));
 
@@ -83,12 +85,13 @@ static void treap_clear(treap_t *tr)
 static void treap_insert(treap_t *tr, treap_node_t **p, void *key, void *val)
 {
   if (!(*p)) {
-    (*p) = new_treap_node(
+    *p = new_treap_node(
       tr->_emulate_key.clone(key),
       tr->_emulate_val.clone(val));
   }
   else if (tr->_emulate_key.cmp((*p)->_key, key) == 0) {
     tr->_emulate_val.free((*p)->_val);
+    free((*p)->_val);
     (*p)->_val = tr->_emulate_val.clone(val);
   }
   else if (tr->_emulate_key.cmp((*p)->_key, key) > 0) {
@@ -190,8 +193,8 @@ static void treap_zag(treap_t *tr, treap_node_t **p)
 }
 
 treap_emulate_t treap_emulate_int = {
-  emulate_int_cmp, emulate_int_clone, emulate_int_free
+  emulate_clone_int, emulate_free_int, emulate_cmp_int
 };
-treap_emulate_t treap_emulate_str = {
-  emulate_str_cmp, emulate_str_clone, emulate_str_free
+treap_emulate_t treap_emulate_pchar = {
+  emulate_clone_pchar, emulate_free_pchar, emulate_cmp_pchar
 };

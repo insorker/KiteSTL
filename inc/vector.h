@@ -1,22 +1,34 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-typedef struct vector_t {
+#include <stddef.h>
+#include <stdbool.h>
+#include "emulate.h"
+
+typedef struct vector_emulate_t
+{
+  size_t tsize;
+  emulate_clone_t clone;
+  emulate_free_t free;
+} vector_emulate_t;
+
+typedef struct vector_t
+{
 /** public */
   /* Return size */
-  int (*size)(struct vector_t *);
+  size_t (*size)(struct vector_t *);
 
   /* Test whether vector is empty */
-  int (*empty)(struct vector_t *);
+  bool (*empty)(struct vector_t *);
 
   /* Access element */
-  void *(*at)(struct vector_t *, int n);
+  void *(*at)(struct vector_t *, size_t n);
 
   /* Insert elements */
-  void (*insert)(struct vector_t *, int n, void *val);
+  void (*insert)(struct vector_t *, size_t n, void *val);
 
-  /* Remove elements */
-  void (*remove)(struct vector_t *, int n);
+  /* Erase elements */
+  void (*erase)(struct vector_t *, size_t n);
 
   /* 	Add element at the end */
   void (*push_back)(struct vector_t *, void *val);
@@ -35,14 +47,19 @@ typedef struct vector_t {
   void (*shrink)(struct vector_t *);
 
 /** private */
-  int _size;
-  int _capacity;
-  int _size_type;
+  size_t _size;
+  size_t _capacity;
+  size_t _tsize;
   void *_elem;
+
+  vector_emulate_t _emulate_elem;
 
 } vector_t;
 
-vector_t *new_vector(int size_type);
+vector_t *new_vector(vector_emulate_t emulate_elem);
 void free_vector(vector_t *);
+
+extern vector_emulate_t vector_emulate_int;
+extern vector_emulate_t vector_emulate_pchar;
 
 #endif
