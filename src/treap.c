@@ -162,8 +162,8 @@ static void treap_extract(treap_t *tr, treap_node_t **p, vector_t *keys, vector_
   if (!(*p)) return;
 
   if ((*p)->_le) treap_extract(tr, &(*p)->_le, keys, vals);
-  keys->push_back(keys, tr->_emulate_key.clone((*p)->_key));
-  vals->push_back(vals, tr->_emulate_val.clone((*p)->_val));
+  keys->push_back(keys, (*p)->_key);
+  vals->push_back(vals, (*p)->_val);
   if ((*p)->_ri) treap_extract(tr, &(*p)->_ri, keys, vals);
 }
 

@@ -107,21 +107,20 @@ void test_str_str()
     );
   }
 
-  // vector_t *keys = new_vector(2 * sizeof(char));
-  // vector_t *vals = new_vector(2 * sizeof(char));
-  // map->extract(map, keys, vals);
+  vector_t *keys = new_vector(vector_emulate_pchar);
+  vector_t *vals = new_vector(vector_emulate_pchar);
 
-  // for (int i = 0; i < keys->size(keys); i++) {
-  //   printf("%s", (char *)keys->at(keys, i));
-  // }
-  // printf("\n");
-  // for (int i = 0; i < vals->size(vals); i++) {
-  //   printf("%s", (char *)vals->at(vals, i));
-  // }
-  // printf("\n");
+  map->extract(map, keys, vals);
 
-  // free_vector(keys);
-  // free_vector(vals);
+  for (char c = 'a'; c <= 'z'; c++) {
+    char cc[] = { c, '\0' };
+    TEST_ASSERT(strcmp(*(char **)keys->at(keys, c - 'a'), cc) == 0, ERR_MAP_INSERT);
+    TEST_ASSERT(strcmp(*(char **)vals->at(vals, c - 'a'), cc) == 0, ERR_MAP_INSERT);
+  }
+
+  free_vector(keys);
+  free_vector(vals);
+
   free_map(map);
 }
 
