@@ -6,6 +6,15 @@
 
 #define VECTOR_DEFAULT_CAPACITY 3
 
+static void *cemu_vector_new(void *arg);
+static void  cemu_vector_delete(void *self);
+cemu_t cemu_vector()
+{
+  return (cemu_t){
+    cemu_vector_new, NULL, NULL, cemu_vector_delete
+  };
+}
+
 static size_t vector_size(vector_t *);
 static bool vector_empty(vector_t *);
 static void *vector_at(vector_t *, size_t n);
@@ -18,10 +27,10 @@ static void vector_clear(vector_t *);
 static void vector_expand(vector_t *);
 static void vector_shrink(vector_t *);
 
-
-vector_t *new_vector(vector_emulate_t emulate_elem)
+void *cemu_vector_new(void *arg)
 {
-  vector_t *vec = (vector_t *)malloc(sizeof(vector_t));
+  vector_type_t vector_type = *(vector_type_t *)arg;
+  vector_t *vec = malloc(sizeof(vector_t));
 
   vec->size = vector_size;
   vec->empty = vector_empty;
@@ -37,23 +46,35 @@ vector_t *new_vector(vector_emulate_t emulate_elem)
 
   vec->_size = 0;
   vec->_capacity = VECTOR_DEFAULT_CAPACITY;
-  vec->_tsize = emulate_elem.tsize;
-  vec->_elem = (void *)malloc(vec->_capacity * vec->_tsize);
+  vec->_tsize = vector_type.tsize;
+  vec->_elem = malloc(vec->_capacity * vec->_tsize);
 
-  vec->_emulate_elem = emulate_elem;
+  vec->_cemu_elem = vector_type.cemu_elem;
 
   return vec;
 }
 
-void free_vector(vector_t *vec)
+static void  cemu_vector_delete(void *self)
 {
+  vector_t *vec = self;
+
   for (size_t i = 0; i < vec->_size; i++) {
-    vec->_emulate_elem.free(vec->_elem + vec->_tsize * i);
+    void *elem = vec->_elem + vec->_tsize * i;
+    vec->_cemu_elem.dtor(elem);
   }
   free(vec->_elem);
   free(vec);
 }
 
+vector_t *new_vector(vector_type_t vector_type)
+{
+  return cemu_vector_new(&vector_type);
+}
+
+void delete_vector(vector_t *vec)
+{
+  cemu_vector_delete(vec);
+}
 
 static size_t vector_size(vector_t *vec)
 {
@@ -84,12 +105,10 @@ static void vector_insert(vector_t *vec, size_t n, void *val)
     memcpy(elem_next, elem_prev, vec->_tsize);
   }
 
-  void *val_copy = vec->_emulate_elem.clone(val);
-  memcpy(
-    vec->_elem + vec->_tsize * n, 
-    val_copy,
-    vec->_tsize);
-  free(val_copy);
+  void *dest = vec->_elem + vec->_tsize * n;
+  void *src = val;
+  vec->_cemu_elem.assign(dest, src, vec->_tsize);
+
   vec->_size += 1;
 }
 
@@ -103,6 +122,7 @@ static void vector_erase(vector_t *vec, size_t n)
 
     memcpy(elem_prev, elem_next, vec->_tsize);
   }
+
   vec->_size -= 1;
   vec->shrink(vec);
 }
@@ -130,7 +150,7 @@ static void vector_expand(vector_t *vec)
   assert(vec->_capacity * 2 >= vec->_capacity);
 
   vec->_capacity *= 2;
-  vec->_elem = (void *)realloc(vec->_elem, vec->_capacity * vec->_tsize);
+  vec->_elem = realloc(vec->_elem, vec->_capacity * vec->_tsize);
 }
 
 static void vector_shrink(vector_t *vec)
@@ -139,12 +159,12 @@ static void vector_shrink(vector_t *vec)
   if (vec->_capacity < vec->_size * 2) return;
 
   vec->_capacity /= 2;
-  vec->_elem = (void *)realloc(vec->_elem, vec->_capacity * vec->_tsize);
+  vec->_elem = realloc(vec->_elem, vec->_capacity * vec->_tsize);
 }
 
-vector_emulate_t vector_emulate_int = {
-  sizeof(int), emulate_clone_int, emulate_free_int
-};
-vector_emulate_t vector_emulate_pchar = {
-  sizeof(char *), emulate_clone_pchar, emulate_free_pchar
-};
+vector_type_t vector_int()
+{
+  return (vector_type_t){
+    sizeof(int), cemu_int()
+  };
+}

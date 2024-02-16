@@ -39,7 +39,7 @@ void test_int_int()
 {
   TEST_PRINT_FUNC();
 
-  map_t *map = new_map(treap_emulate_int, treap_emulate_int);
+  map_t *map = new_map(treap_cemu_int, treap_cemu_int);
 
   map->insert(map, &(int){1}, &(int){1});
   map->insert(map, &(int){2}, &(int){2});
@@ -73,7 +73,7 @@ void test_str_int()
 {
   TEST_PRINT_FUNC();
 
-  map_t *map = new_map(treap_emulate_pchar, treap_emulate_int);
+  map_t *map = new_map(treap_cemu_pchar, treap_cemu_int);
 
   map->insert(map, &(char *){"John"}, &(int){100});
   map->insert(map, &(char *){"Mary"}, &(int){98});
@@ -100,7 +100,7 @@ void test_str_str()
 {
   TEST_PRINT_FUNC();
 
-  map_t *map = new_map(treap_emulate_pchar, treap_emulate_pchar);
+  map_t *map = new_map(treap_cemu_pchar, treap_cemu_pchar);
 
   for (char c = 'a'; c <= 'z'; c++) {
     char cc[] = { c, '\0' };
@@ -118,8 +118,8 @@ void test_str_str()
   }
   TEST_ASSERT(map->size(map) == 26, ERR_MAP_SIZE);
 
-  vector_t *keys = new_vector(vector_emulate_pchar);
-  vector_t *vals = new_vector(vector_emulate_pchar);
+  vector_t *keys = new_vector(vector_cemu_pchar);
+  vector_t *vals = new_vector(vector_cemu_pchar);
 
   map->extract(map, keys, vals);
 
@@ -165,7 +165,7 @@ void test_str_struct()
 {
   TEST_PRINT_FUNC();
 
-  map_t *map = new_map(treap_emulate_pchar, (treap_emulate_t) {
+  map_t *map = new_map(treap_cemu_pchar, (treap_cemu_t) {
     pair_int_clone, pair_int_free, pair_int_cmp
   });
 

@@ -3,14 +3,13 @@
 
 #include <stddef.h>
 #include <stdbool.h>
-#include "emulate.h"
+#include "cemu.h"
 
-typedef struct vector_emulate_t
+typedef struct
 {
   size_t tsize;
-  emulate_clone_t clone;
-  emulate_free_t free;
-} vector_emulate_t;
+  cemu_t cemu_elem;
+} vector_type_t;
 
 typedef struct vector_t
 {
@@ -52,14 +51,15 @@ typedef struct vector_t
   size_t _tsize;
   void *_elem;
 
-  vector_emulate_t _emulate_elem;
+  cemu_t _cemu_elem;
 
 } vector_t;
 
-vector_t *new_vector(vector_emulate_t emulate_elem);
-void free_vector(vector_t *);
+cemu_t cemu_vector();
 
-extern vector_emulate_t vector_emulate_int;
-extern vector_emulate_t vector_emulate_pchar;
+vector_t *new_vector(vector_type_t vector_type);
+void delete_vector(vector_t *);
+
+vector_type_t vector_int();
 
 #endif
