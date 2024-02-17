@@ -43,9 +43,9 @@ void cemu_map_delete(void *self)
   free(map);
 }
 
-map_t *new_map(cemu_t cemu_key, cemu_t cemu_val)
+map_t *new_map(cemu_t cemu_key, cemu_t cemu_val, treap_key_cmp_t key_cmp)
 {
-  return cemu_map_new(&(treap_arg_t){cemu_key, cemu_val});
+  return cemu_map_new(&(treap_arg_t){cemu_key, cemu_val, key_cmp});
 }
 
 void delete_map(map_t *map)
@@ -63,17 +63,17 @@ static void map_clear(map_t *map)
   map->_tr->clear(map->_tr);
 }
 
-static void map_insert(map_t *map,  void *key, void *val)
+static void map_insert(map_t *map, void *key, void *val)
 {
   map->_tr->insert(map->_tr, &map->_tr->_root, key, val);
 }
 
-static void map_erase(map_t *map,  void *key)
+static void map_erase(map_t *map, void *key)
 {
   map->_tr->erase(map->_tr, &map->_tr->_root, key);
 }
 
-static void *map_find(map_t *map,  void *key)
+static void *map_find(map_t *map, void *key)
 {
   return map->_tr->find(map->_tr, &map->_tr->_root, key);
 }

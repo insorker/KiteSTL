@@ -16,10 +16,16 @@ static void treap_pushup(treap_t *, treap_node_t **p);
 static void treap_zig(treap_t *, treap_node_t **p);
 static void treap_zag(treap_t *, treap_node_t **p);
 
+/**
+ * ====================
+ * cemu
+ * ==================== 
+ */
+
 cemu_t cemu_treap()
 {
   return (cemu_t){
-    cemu_treap_size, cemu_treap_new, NULL, NULL, cemu_treap_delete
+    cemu_treap_size, cemu_treap_new, NULL, cemu_treap_dtor, cemu_treap_delete
   };
 }
 
@@ -28,9 +34,30 @@ int cemu_treap_size()
   return sizeof(treap_t);
 }
 
+static int treap_key_cmp(treap_t *self, void *lhs, void *rhs)
+{
+  if (self->_key_cmp) {
+    return self->_key_cmp(lhs, rhs);
+  }
+  else if (self->_cemu_key.eq && self->_cemu_key.gt) {
+    if (self->_cemu_key.eq(lhs, rhs)) {
+      return 0;
+    }
+    else if (self->_cemu_key.gt(lhs, rhs)) {
+      return 1;
+    }
+    else {
+      return -1;
+    }
+  }
+  else {
+    assert(0);
+  }
+}
+
 void *cemu_treap_new(void *arg)
 {
-  treap_arg_t *treap_arg = arg;
+  treap_arg_t *tr_arg = arg;
   treap_t *tr = malloc(sizeof(treap_t));
 
   tr->size = treap_size;
@@ -44,19 +71,31 @@ void *cemu_treap_new(void *arg)
   tr->zig = treap_zig;
   tr->zag = treap_zag;
 
-  tr->_cemu_key = treap_arg->cemu_key;
-  tr->_cemu_val = treap_arg->cemu_val;
+  tr->_cemu_key = tr_arg->cemu_key;
+  tr->_cemu_val = tr_arg->cemu_val;
+  tr->_key_cmp = tr_arg->key_cmp;
   tr->_root = NULL;
 
   return tr;
 }
 
-void cemu_treap_delete(void *self)
+void cemu_treap_dtor(void *self)
 {
   treap_t *tr = self;
   delete_treap_node(tr, tr->_root);
-  free(tr);
 }
+
+void cemu_treap_delete(void *self)
+{
+  cemu_treap_dtor(self);
+  free(self);
+}
+
+/**
+ * ====================
+ * imitate func
+ * ==================== 
+ */
 
 treap_node_t *new_treap_node(void *key, void *val)
 {
@@ -83,15 +122,21 @@ void delete_treap_node(treap_t *tr, treap_node_t *p)
   free(p);
 }
 
-treap_t *new_treap(cemu_t cemu_key, cemu_t cemu_val)
+treap_t *new_treap(cemu_t cemu_key, cemu_t cemu_val, treap_key_cmp_t key_cmp)
 {
-  return cemu_treap_new(&(treap_arg_t){ cemu_key, cemu_val });
+  return cemu_treap_new(&(treap_arg_t){cemu_key, cemu_val, key_cmp});
 }
 
 void delete_treap(treap_t *tr)
 {
   cemu_treap_delete(tr);
 }
+
+/**
+ * ====================
+ * api
+ * ==================== 
+ */
 
 static int treap_size(treap_t *tr)
 {
@@ -112,11 +157,13 @@ static void treap_insert(treap_t *tr, treap_node_t **p, void *key, void *val)
       tr->_cemu_key.copy(key),
       tr->_cemu_val.copy(val));
   }
-  else if (tr->_cemu_key.eq((*p)->_key, key)) {
+  // else if (tr->_cemu_key.eq((*p)->_key, key)) {
+  else if (treap_key_cmp(tr, (*p)->_key, key) == 0) {
     tr->_cemu_val.delete((*p)->_val);
     (*p)->_val = tr->_cemu_val.copy(val);
   }
-  else if (tr->_cemu_key.gt((*p)->_key, key) > 0) {
+  // else if (tr->_cemu_key.gt((*p)->_key, key) > 0) {
+  else if (treap_key_cmp(tr, (*p)->_key, key) > 0) {
     tr->insert(tr, &(*p)->_le, key, val);
     if ((*p)->_val < (*p)->_le->_val) tr->zig(tr, p);
   }
@@ -131,7 +178,8 @@ static void treap_insert(treap_t *tr, treap_node_t **p, void *key, void *val)
 static void treap_erase(treap_t *tr, treap_node_t **p, void *key)
 {
   if (!(*p)) return;
-  else if (tr->_cemu_key.eq((*p)->_key, key)) {
+  // else if (tr->_cemu_key.eq((*p)->_key, key)) {
+  else if (treap_key_cmp(tr, (*p)->_key, key) == 0) {
     if ((*p)->_le || (*p)->_ri) {
       if (!(*p)->_ri) {
         tr->zig(tr, p);
@@ -155,7 +203,8 @@ static void treap_erase(treap_t *tr, treap_node_t **p, void *key)
       *p = NULL;
     }
   }
-  else if (tr->_cemu_key.gt((*p)->_key, key)) {
+  // else if (tr->_cemu_key.gt((*p)->_key, key)) {
+  else if (treap_key_cmp(tr, (*p)->_key, key) > 0) {
     tr->erase(tr, &(*p)->_le, key);
   }
   else {
@@ -168,10 +217,12 @@ static void treap_erase(treap_t *tr, treap_node_t **p, void *key)
 static void *treap_find(treap_t *tr, treap_node_t **p, void *key)
 {
   if (!(*p)) return NULL;
-  else if (tr->_cemu_key.eq((*p)->_key, key)) {
+  // else if (tr->_cemu_key.eq((*p)->_key, key)) {
+  else if (treap_key_cmp(tr, (*p)->_key, key) == 0) {
     return (*p)->_val;
   }
-  else if (tr->_cemu_key.gt((*p)->_key, key)) {
+  // else if (tr->_cemu_key.gt((*p)->_key, key)) {
+  else if (treap_key_cmp(tr, (*p)->_key, key) > 0) {
     return tr->find(tr, &(*p)->_le, key);
   }
   else {
@@ -215,10 +266,3 @@ static void treap_zag(treap_t *tr, treap_node_t **p)
   tr->pushup(tr, &(*p)->_le);
   tr->pushup(tr, p);
 }
-
-// treap_cemu_t treap_cemu_int = {
-//   cemu_clone_int, cemu_free_int, cemu_cmp_int
-// };
-// treap_cemu_t treap_cemu_pchar = {
-//   cemu_clone_pchar, cemu_free_pchar, cemu_cmp_pchar
-// };

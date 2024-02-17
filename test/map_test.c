@@ -39,7 +39,7 @@ void test_int_int()
 {
   TEST_PRINT_FUNC();
 
-  map_t *map = new_map(cemu_int(), cemu_int());
+  map_t *map = new_map(cemu_int(), cemu_int(), NULL);
 
   map->insert(map, &(int){1}, &(int){1});
   map->insert(map, &(int){2}, &(int){2});
