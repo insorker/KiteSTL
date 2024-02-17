@@ -15,9 +15,10 @@ void *cemu_str_new(void *arg)
   int sz = strlen(*src) + 1;
 
   assert(dest != NULL);
-  *dest = malloc(sz);
+  *dest = malloc(sz * sizeof(char));
   assert(*dest != NULL);
   strncpy(*dest, *src, sz);
+  assert((*dest)[sz - 1] == '\0');
   
   return dest;
 }
@@ -33,8 +34,9 @@ void cemu_str_dtor(void *self)
   free(*str);
 }
 
-void  cemu_str_delete(void *self)
+void cemu_str_delete(void *self)
 {
+  cemu_str_dtor(self);
   free(self);
 }
 
@@ -74,7 +76,7 @@ bool cemu_str_op_eq(void *lhs, void *rhs)
   }
   else {
     for (int i = 0; i < lsz; i++) {
-      if (*lstr[i] != *rstr[i]) {
+      if ((*lstr)[i] != (*rstr)[i]) {
         return false;
       }
     }
@@ -97,10 +99,10 @@ bool cemu_str_op_lt(void *lhs, void *rhs)
   int sz = lsz > rsz ? rsz : lsz;
 
   for (int i = 0; i < sz; i++) {
-    if (*lstr[i] == *rstr[i]) {
+    if ((*lstr)[i] == (*rstr)[i]) {
       continue;
     }
-    else if (*lstr[i] < *rstr[i]) {
+    else if ((*lstr)[i] < (*rstr)[i]) {
       return true;
     }
     else {

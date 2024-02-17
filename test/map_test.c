@@ -2,6 +2,7 @@
 #include "map.h"
 #include "vector.h"
 #include "cemu_int.h"
+#include "cemu_str.h"
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
@@ -14,10 +15,7 @@ const char *ERR_MAP_SIZE = "Error -> map->size";
 void test_int_int();
 void test_str_int();
 void test_str_str();
-int pair_int_cmp(void *lhs, void *rhs);
-void *pair_int_clone(void *val);
-void pair_int_free(void *val);
-void test_str_struct();
+void test_struct_str();
 
 int main()
 {
@@ -27,7 +25,7 @@ int main()
     test_int_int,
     test_str_int,
     test_str_str,
-    test_str_struct,
+    test_struct_str,
     NULL
   };
 
@@ -72,108 +70,117 @@ void test_int_int()
 
 void test_str_int()
 {
-  // TEST_PRINT_FUNC();
+  TEST_PRINT_FUNC();
 
-  // map_t *map = new_map(treap_cemu_pchar, treap_cemu_int);
+  map_t *map = new_map(cemu_str(), cemu_int(), NULL);
 
-  // map->insert(map, &(char *){"John"}, &(int){100});
-  // map->insert(map, &(char *){"Mary"}, &(int){98});
-  // map->insert(map, &(char *){"David"}, &(int){70});
-  // TEST_ASSERT(map->size(map) == 3, ERR_MAP_SIZE);
+  map->insert(map, &(char *){"John"}, &(int){100});
+  map->insert(map, &(char *){"Mary"}, &(int){98});
+  map->insert(map, &(char *){"David"}, &(int){70});
+  TEST_ASSERT(map->size(map) == 3, ERR_MAP_SIZE);
 
-  // TEST_ASSERT(*(int *)map->find(map, &(char *){"John"}) == 100, ERR_MAP_FIND);
-  // TEST_ASSERT(*(int *)map->find(map, &(char *){"Mary"}) == 98, ERR_MAP_FIND);
+  TEST_ASSERT(*(int *)map->find(map, &(char *){"John"}) == 100, ERR_MAP_FIND);
+  TEST_ASSERT(*(int *)map->find(map, &(char *){"Mary"}) == 98, ERR_MAP_FIND);
 
-  // TEST_ASSERT(*(int *)map->find(map, &(char *){"David"}) == 70, ERR_MAP_FIND);
-  // TEST_ASSERT(map->find(map, &(char *){"Tom"}) == NULL, ERR_MAP_FIND);
+  TEST_ASSERT(*(int *)map->find(map, &(char *){"David"}) == 70, ERR_MAP_FIND);
+  TEST_ASSERT(map->find(map, &(char *){"Tom"}) == NULL, ERR_MAP_FIND);
 
-  // map->erase(map, &(char *){"Tom"});
-  // map->erase(map, &(char *){"John"});
-  // TEST_ASSERT(map->size(map) == 2, ERR_MAP_SIZE);
+  map->erase(map, &(char *){"Tom"});
+  map->erase(map, &(char *){"John"});
+  TEST_ASSERT(map->size(map) == 2, ERR_MAP_SIZE);
 
-  // TEST_ASSERT(map->find(map, &(char *){"John"}) == NULL, ERR_MAP_ERASE);
-  // TEST_ASSERT(*(int *)map->find(map, &(char *){"David"}) == 70, ERR_MAP_ERASE);
+  TEST_ASSERT(map->find(map, &(char *){"John"}) == NULL, ERR_MAP_ERASE);
+  TEST_ASSERT(*(int *)map->find(map, &(char *){"David"}) == 70, ERR_MAP_ERASE);
 
-  // delete_map(map);
+  delete_map(map);
 }
 
 void test_str_str()
 {
-  // TEST_PRINT_FUNC();
+  TEST_PRINT_FUNC();
 
-  // map_t *map = new_map(treap_cemu_pchar, treap_cemu_pchar);
+  map_t *map = new_map(cemu_str(), cemu_str(), NULL);
 
-  // for (char c = 'a'; c <= 'z'; c++) {
-  //   char cc[] = { c, '\0' };
+  for (char c = 'a'; c <= 'z'; c++) {
+    char cc[] = { c, '\0' };
 
-  //   map->insert(map, &(char *){cc}, &(char *){cc});
-  // }
+    map->insert(map, &(char *){cc}, &(char *){cc});
+  }
 
-  // for (char c = 'a'; c <= 'z'; c++) {
-  //   char cc[2] = { c, '\0' };
+  for (char c = 'a'; c <= 'z'; c++) {
+    char cc[2] = { c, '\0' };
 
-  //   TEST_ASSERT(
-  //     strcmp(*(char **)map->find(map, &(char *){cc}), cc) == 0,
-  //     ERR_MAP_INSERT
-  //   );
-  // }
-  // TEST_ASSERT(map->size(map) == 26, ERR_MAP_SIZE);
+    TEST_ASSERT(
+      strcmp(*(char **)map->find(map, &(char *){cc}), cc) == 0,
+      ERR_MAP_INSERT
+    );
+  }
+  TEST_ASSERT(map->size(map) == 26, ERR_MAP_SIZE);
 
-  // vector_t *keys = new_vector(vector_cemu_pchar);
-  // vector_t *vals = new_vector(vector_cemu_pchar);
+  vector_t *keys = new_vector(cemu_str());
+  vector_t *vals = new_vector(cemu_str());
 
-  // map->extract(map, keys, vals);
+  map->extract(map, keys, vals);
 
-  // for (char c = 'a'; c <= 'z'; c++) {
-  //   char cc[] = { c, '\0' };
-  //   TEST_ASSERT(strcmp(*(char **)keys->at(keys, c - 'a'), cc) == 0, ERR_MAP_INSERT);
-  //   TEST_ASSERT(strcmp(*(char **)vals->at(vals, c - 'a'), cc) == 0, ERR_MAP_INSERT);
-  // }
+  for (char c = 'a'; c <= 'z'; c++) {
+    char cc[] = { c, '\0' };
+    TEST_ASSERT(strcmp(*(char **)keys->at(keys, c - 'a'), cc) == 0, ERR_MAP_INSERT);
+    TEST_ASSERT(strcmp(*(char **)vals->at(vals, c - 'a'), cc) == 0, ERR_MAP_INSERT);
+  }
 
-  // free_vector(keys);
-  // free_vector(vals);
+  delete_vector(keys);
+  delete_vector(vals);
 
-  // delete_map(map);
+  delete_map(map);
 }
 
-// struct pair_int {
-//   int fi, se;
-// };
+typedef struct {
+  int fi, se;
+} pair_int_t;
 
-// int pair_int_cmp(void *lhs, void *rhs)
-// {
-//   struct pair_int *le = (struct pair_int *)lhs;
-//   struct pair_int *ri = (struct pair_int *)rhs;
-
-//   if (le->fi == ri->fi && le->se == ri->se) return 0;
-//   return le->fi > ri->fi ? 1 : -1;
-// }
-
-// void *pair_int_clone(void *val)
-// {
-//   struct pair_int *val_copy = (struct pair_int *)malloc(sizeof(struct pair_int));
-
-//   val_copy->fi = ((struct pair_int *)val)->fi;
-//   val_copy->se = ((struct pair_int *)val)->se;
-
-//   return val_copy;
-// }
-// void pair_int_free(void *val)
-// {
-// }
-
-void test_str_struct()
+void *cemu_pair_int_copy(void *other)
 {
-  // TEST_PRINT_FUNC();
+  pair_int_t *p_other = other;
+  pair_int_t *p = malloc(sizeof(pair_int_t));
 
-  // map_t *map = new_map(treap_cemu_pchar, (treap_cemu_t) {
-  //   pair_int_clone, pair_int_free, pair_int_cmp
-  // });
+  p->fi = p_other->fi;
+  p->se = p_other->se;
 
-  // map->insert(map, &(char *){"{1, 2}"}, &(struct pair_int){ 1, 2 });
-  // map->insert(map, &(char *){"{2, 3}"}, &(struct pair_int){ 2, 3 });
+  return p;
+}
 
-  // TEST_ASSERT(((struct pair_int *)map->find(map, &(char *){"{1, 2}"}))->fi == 1, ERR_MAP_INSERT);
+void cemu_pair_int_delete(void *self)
+{
+  free(self);
+}
 
-  // delete_map(map);
+int pair_int_cmp(void *lhs, void *rhs)
+{
+  pair_int_t *le = (pair_int_t *)lhs;
+  pair_int_t *ri = (pair_int_t *)rhs;
+
+  if (le->fi == ri->fi && le->se == ri->se) return 0;
+  return le->fi > ri->fi ? 1 : -1;
+}
+
+cemu_t cemu_pair_int()
+{
+  return (cemu_t){
+    NULL,
+    NULL, cemu_pair_int_copy, NULL, cemu_pair_int_delete
+  };
+}
+
+void test_struct_str()
+{
+  TEST_PRINT_FUNC();
+
+  map_t *map = new_map(cemu_pair_int(), cemu_str(), pair_int_cmp);
+
+  map->insert(map, &(pair_int_t){ 1, 2 }, &(char *){"{1, 2}"});
+  map->insert(map, &(pair_int_t){ 2, 3 }, &(char *){"{2, 3}"});
+
+  TEST_ASSERT(strcmp(*(char **)map->find(map, &(pair_int_t){ 1, 2 }), "{1, 2}") == 0, ERR_MAP_INSERT);
+
+  delete_map(map);
 }

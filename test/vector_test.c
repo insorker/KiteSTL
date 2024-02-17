@@ -125,48 +125,72 @@ void test_str() {
   delete_vector(vec);
 }
 
-// typedef struct people_t {
-//   char name[10];
-//   int age;
-// } people_t;
+typedef struct {
+  char name[10];
+  int age;
+} people_t;
 
-// void *cemu_clone_people(void *val)
-// {
-//   people_t *val_copy = (people_t *)malloc(sizeof(people_t));
-//   memcpy(val_copy, val, sizeof(people_t));
+int cemu_people_size()
+{
+  return sizeof(people_t);
+}
 
-//   return val_copy;
-// }
+void *cemu_people_copy(void *other)
+{
+  people_t *p_other = other;
+  people_t *p = malloc(sizeof(people_t));
 
-// void cemu_free_people(void *val)
-// {
-// }
+  for (int i = 0; i < 10; i++) {
+    p->name[i] = p_other->name[i];
+  }
+  p->age = p_other->age;
+
+  return p;
+}
+
+void cemu_people_dtor(void *self)
+{
+  
+}
+
+void cemu_people_op_assign(void *dest, void *src)
+{
+  void *copy = cemu_people_copy(src);
+  memcpy(dest, copy, cemu_people_size());
+  free(copy);
+}
+
+cemu_t cemu_people()
+{
+  return (cemu_t){
+    cemu_people_size,
+    NULL, cemu_people_copy, cemu_people_dtor, NULL, cemu_people_op_assign
+  };
+}
 
 void test_struct() {
-  // TEST_PRINT_FUNC();
+  TEST_PRINT_FUNC();
 
-  // vector_t *vec = new_vector((vector_cemu_t){
-  //   sizeof(people_t), cemu_clone_people, cemu_free_people
-  // });
-  // people_t people[] = {
-  //   { "John", 1 },
-  //   { "Mary", 5 },
-  //   { "Max", 10 },
-  //   { "Ben", 43 },
-  //   { "Tom", 18 }
-  // };
+  vector_t *vec = new_vector(cemu_people());
+  people_t people[] = {
+    { "John", 1 },
+    { "Mary", 5 },
+    { "Max", 10 },
+    { "Ben", 43 },
+    { "Tom", 18 }
+  };
 
-  // vec->push_back(vec, &people[0]);
-  // vec->push_back(vec, &people[1]);
-  // vec->push_back(vec, &(people_t){ "Max", 10 });
-  // vec->push_back(vec, &(people_t){ "Ben", 43 });
-  // vec->push_back(vec, &(people_t){ "Tom", 18 });
+  vec->push_back(vec, &people[0]);
+  vec->push_back(vec, &people[1]);
+  vec->push_back(vec, &(people_t){ "Max", 10 });
+  vec->push_back(vec, &(people_t){ "Ben", 43 });
+  vec->push_back(vec, &(people_t){ "Tom", 18 });
 
-  // for (int i = 0; i < vec->size(vec); i++) {
-  //   people_t p = *(people_t *)vec->at(vec, i);
-  //   TEST_ASSERT(strcmp(p.name, people[i].name) == 0, ERR_VECTOR_INSERT);
-  //   TEST_ASSERT(p.age == people[i].age, ERR_VECTOR_INSERT);
-  // }
+  for (int i = 0; i < vec->size(vec); i++) {
+    people_t p = *(people_t *)vec->at(vec, i);
+    TEST_ASSERT(strcmp(p.name, people[i].name) == 0, ERR_VECTOR_INSERT);
+    TEST_ASSERT(p.age == people[i].age, ERR_VECTOR_INSERT);
+  }
 
-  // free_vector(vec);
+  delete_vector(vec);
 }

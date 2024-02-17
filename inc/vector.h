@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2024
  * 
  * cemu {
- *  size, copy, dtor, assign
+ *  size, dtor, assign
  * }
  */
 #ifndef VECTOR_H

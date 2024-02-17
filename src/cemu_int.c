@@ -25,7 +25,7 @@ void cemu_int_dtor(void *self)
 {
 }
 
-void  cemu_int_delete(void *self)
+void cemu_int_delete(void *self)
 {
   free(self);
 }
