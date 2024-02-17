@@ -53,7 +53,7 @@ void  cemu_int_delete(void *self)
   free(self);
 }
 
-void cemu_int_op_assign(void *dest, void *src, int size)
+void cemu_int_op_assign(void *dest, void *src)
 {
   // void *copy = cemu_int_copy(src);
   // memcpy(dest, copy, sizeof(int));

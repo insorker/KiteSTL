@@ -66,7 +66,7 @@ void test_int_int()
     TEST_ASSERT(map->size(map) == i + 1, ERR_MAP_SIZE);
   }
 
-  free_map(map);
+  delete_map(map);
 }
 
 void test_str_int()
@@ -93,7 +93,7 @@ void test_str_int()
   // TEST_ASSERT(map->find(map, &(char *){"John"}) == NULL, ERR_MAP_ERASE);
   // TEST_ASSERT(*(int *)map->find(map, &(char *){"David"}) == 70, ERR_MAP_ERASE);
 
-  // free_map(map);
+  // delete_map(map);
 }
 
 void test_str_str()
@@ -132,7 +132,7 @@ void test_str_str()
   // free_vector(keys);
   // free_vector(vals);
 
-  // free_map(map);
+  // delete_map(map);
 }
 
 // struct pair_int {
@@ -174,5 +174,5 @@ void test_str_struct()
 
   // TEST_ASSERT(((struct pair_int *)map->find(map, &(char *){"{1, 2}"}))->fi == 1, ERR_MAP_INSERT);
 
-  // free_map(map);
+  // delete_map(map);
 }

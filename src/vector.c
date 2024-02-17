@@ -6,16 +6,6 @@
 
 #define VECTOR_DEFAULT_CAPACITY 3
 
-static int   cemu_vector_size();
-static void *cemu_vector_new(void *arg);
-static void  cemu_vector_delete(void *self);
-cemu_t cemu_vector()
-{
-  return (cemu_t){
-    cemu_vector_size, cemu_vector_new, NULL, NULL, cemu_vector_delete
-  };
-}
-
 static size_t vector_size(vector_t *);
 static bool vector_empty(vector_t *);
 static void *vector_at(vector_t *, size_t n);
@@ -28,12 +18,25 @@ static void vector_clear(vector_t *);
 static void vector_expand(vector_t *);
 static void vector_shrink(vector_t *);
 
-static int cemu_vector_size()
+/**
+ * ====================
+ * cemu
+ * ==================== 
+ */
+
+cemu_t cemu_vector()
+{
+  return (cemu_t){
+    cemu_vector_size, cemu_vector_new, NULL, NULL, cemu_vector_delete
+  };
+}
+
+int cemu_vector_size()
 {
   return sizeof(vector_t);
 }
 
-static void *cemu_vector_new(void *arg)
+void *cemu_vector_new(void *arg)
 {
   cemu_t cemu = *(cemu_t *)arg;
   vector_t *vec = malloc(sizeof(vector_t));
@@ -60,7 +63,41 @@ static void *cemu_vector_new(void *arg)
   return vec;
 }
 
-static void cemu_vector_delete(void *self)
+void *cemu_vector_copy(void *other)
+{
+  vector_t *vec_other = other;
+  vector_t *vec = malloc(sizeof(vector_t));
+
+  vec->size = vector_size;
+  vec->empty = vector_empty;
+  vec->at = vector_at;
+  vec->insert = vector_insert;
+  vec->erase = vector_erase;
+  vec->push_back = vector_push_back;
+  vec->pop_back = vector_pop_back;
+  vec->clear = vector_clear;
+
+  vec->expand = vector_expand;
+  vec->shrink = vector_shrink;
+
+  vec->_size = vec_other->_size;
+  vec->_capacity = vec_other->_capacity;
+  vec->_tsize = vec_other->_tsize;
+  vec->_elem = malloc(vec->_capacity * vec->_tsize);
+
+  vec->_cemu_elem = vec_other->_cemu_elem;
+
+  for (size_t i = 0; i < vec->_size; i++) {
+    void *elem = vec->_elem + vec->_tsize * i;
+    void *elem_other = vec_other->_elem + vec_other->_tsize * i;
+
+    memcpy(elem, elem_other, vec->_cemu_elem.size());
+  }
+
+  return vec;
+}
+
+void cemu_vector_dtor(void *self)
 {
   vector_t *vec = self;
 
@@ -69,8 +106,26 @@ static void cemu_vector_delete(void *self)
     vec->_cemu_elem.dtor(elem);
   }
   free(vec->_elem);
-  free(vec);
 }
+
+void cemu_vector_delete(void *self)
+{
+  cemu_vector_dtor(self);
+  free(self);
+}
+
+void cemu_vector_op_assign(void *dest, void *src)
+{
+  void *copy = cemu_vector_copy(src);
+  memcpy(dest, copy, cemu_vector_size());
+  free(copy);
+}
+
+/**
+ * ====================
+ * imitate func
+ * ==================== 
+ */
 
 vector_t *new_vector(cemu_t cemu)
 {
@@ -81,6 +136,12 @@ void delete_vector(vector_t *vec)
 {
   cemu_vector_delete(vec);
 }
+
+/**
+ * ====================
+ * api
+ * ==================== 
+ */
 
 static size_t vector_size(vector_t *vec)
 {
@@ -113,7 +174,7 @@ static void vector_insert(vector_t *vec, size_t n, void *val)
 
   void *dest = vec->_elem + vec->_tsize * n;
   void *src = val;
-  vec->_cemu_elem.assign(dest, src, vec->_tsize);
+  vec->_cemu_elem.assign(dest, src);
 
   vec->_size += 1;
 }

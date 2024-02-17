@@ -16,34 +16,22 @@ static void treap_pushup(treap_t *, treap_node_t **p);
 static void treap_zig(treap_t *, treap_node_t **p);
 static void treap_zag(treap_t *, treap_node_t **p);
 
-treap_node_t *new_treap_node(void *key, void *val)
+cemu_t cemu_treap()
 {
-  treap_node_t *node = (treap_node_t *)malloc(sizeof(treap_node_t));
-
-  node->_le = node->_ri = NULL;
-  node->_key = key;
-  node->_val = val;
-  node->_rand = rand();
-
-  return node;
+  return (cemu_t){
+    cemu_treap_size, cemu_treap_new, NULL, NULL, cemu_treap_delete
+  };
 }
 
-void free_treap_node(treap_t *tr, treap_node_t *p)
+int cemu_treap_size()
 {
-  if (!p) return;
-
-  tr->_cemu_key.delete(p->_key);
-  tr->_cemu_val.delete(p->_val);
-
-  if (p->_le) free_treap_node(tr, p->_le);
-  if (p->_ri) free_treap_node(tr, p->_ri);
-
-  free(p);
+  return sizeof(treap_t);
 }
 
-treap_t *new_treap(cemu_t cemu_key, cemu_t cemu_val)
+void *cemu_treap_new(void *arg)
 {
-  treap_t *tr = (treap_t *)malloc(sizeof(treap_t));
+  treap_arg_t *treap_arg = arg;
+  treap_t *tr = malloc(sizeof(treap_t));
 
   tr->size = treap_size;
   tr->clear = treap_clear;
@@ -56,17 +44,53 @@ treap_t *new_treap(cemu_t cemu_key, cemu_t cemu_val)
   tr->zig = treap_zig;
   tr->zag = treap_zag;
 
-  tr->_cemu_key = cemu_key;
-  tr->_cemu_val = cemu_val;
+  tr->_cemu_key = treap_arg->cemu_key;
+  tr->_cemu_val = treap_arg->cemu_val;
   tr->_root = NULL;
 
   return tr;
 }
 
-void free_treap(treap_t *tr)
+void cemu_treap_delete(void *self)
 {
-  free_treap_node(tr, tr->_root);
+  treap_t *tr = self;
+  delete_treap_node(tr, tr->_root);
   free(tr);
+}
+
+treap_node_t *new_treap_node(void *key, void *val)
+{
+  treap_node_t *node = (treap_node_t *)malloc(sizeof(treap_node_t));
+
+  node->_le = node->_ri = NULL;
+  node->_key = key;
+  node->_val = val;
+  node->_rand = rand();
+
+  return node;
+}
+
+void delete_treap_node(treap_t *tr, treap_node_t *p)
+{
+  if (!p) return;
+
+  tr->_cemu_key.delete(p->_key);
+  tr->_cemu_val.delete(p->_val);
+
+  if (p->_le) delete_treap_node(tr, p->_le);
+  if (p->_ri) delete_treap_node(tr, p->_ri);
+
+  free(p);
+}
+
+treap_t *new_treap(cemu_t cemu_key, cemu_t cemu_val)
+{
+  return cemu_treap_new(&(treap_arg_t){ cemu_key, cemu_val });
+}
+
+void delete_treap(treap_t *tr)
+{
+  cemu_treap_delete(tr);
 }
 
 static int treap_size(treap_t *tr)
@@ -77,7 +101,7 @@ static int treap_size(treap_t *tr)
 
 static void treap_clear(treap_t *tr)
 {
-  free_treap_node(tr, tr->_root);
+  delete_treap_node(tr, tr->_root);
   tr->_root = NULL;
 }
 
@@ -127,7 +151,7 @@ static void treap_erase(treap_t *tr, treap_node_t **p, void *key)
       }
     }
     else {
-      free_treap_node(tr, *p);
+      delete_treap_node(tr, *p);
       *p = NULL;
     }
   }

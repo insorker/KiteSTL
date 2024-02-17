@@ -1,3 +1,16 @@
+/**
+ * @file treap.h
+ * @author your name (you@domain.com)
+ * @brief 
+ * @version 0.1
+ * @date 2024-02-17
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ * cemu {
+ *   copy, delete, eq, gt
+ * }
+ */
 #ifndef TREAP_H
 #define TREAP_H
 
@@ -13,13 +26,10 @@ typedef struct treap_node_t {
   int _size;
 } treap_node_t;
 
-// typedef struct treap_cemu_t {
-//   cemu_clone_t clone;
-//   cemu_free_t free;
-//   cemu_cmp_t cmp;
-// } treap_cemu_t;
-// typedef treap_cemu_t treap_cemu_key_t;
-// typedef treap_cemu_t treap_cemu_val_t;
+typedef struct {
+  cemu_t cemu_key;
+  cemu_t cemu_val;
+} treap_arg_t;
 
 typedef struct treap_t {
 /** public **/
@@ -54,17 +64,18 @@ typedef struct treap_t {
 /** private **/
   cemu_t _cemu_key;
   cemu_t _cemu_val;
-  // treap_cemu_key_t _cemu_key;
-  // treap_cemu_val_t _cemu_val;
   treap_node_t *_root;
+
 } treap_t;
 
-treap_node_t *new_treap_node(void *key, void *val);
-void free_treap_node(treap_t *, treap_node_t *);
-treap_t *new_treap(cemu_t cemu_key, cemu_t cemu_val);
-void free_treap(treap_t *);
+int   cemu_treap_size();
+void *cemu_treap_new(void *arg);
+void  cemu_treap_delete(void *self);
+cemu_t cemu_treap();
 
-// extern treap_cemu_t treap_cemu_int;
-// extern treap_cemu_t treap_cemu_pchar;
+treap_node_t *new_treap_node(void *key, void *val);
+void delete_treap_node(treap_t *, treap_node_t *);
+treap_t *new_treap(cemu_t cemu_key, cemu_t cemu_val);
+void delete_treap(treap_t *);
 
 #endif

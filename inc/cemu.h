@@ -48,7 +48,7 @@ typedef void (*cemu_delete_t)(void *self);
  * @brief Emulate operator=.
  * 
  */
-typedef void (*cemu_op_assign_t)(void *dest, void *src, int size);
+typedef void (*cemu_op_assign_t)(void *dest, void *src);
 
 /**
  * @brief Emulate operator+.
@@ -161,7 +161,7 @@ void *cemu_int_new(void *arg);
 void *cemu_int_copy(void *other);
 void  cemu_int_dtor(void *self);
 void  cemu_int_delete(void *self);
-void  cemu_int_op_assign(void *dest, void *src, int size);
+void  cemu_int_op_assign(void *dest, void *src);
 void *cemu_int_op_add(void *lhs, void *rhs);
 void *cemu_int_op_sub(void *lhs, void *rhs);
 void *cemu_int_op_mul(void *lhs, void *rhs);
@@ -173,15 +173,5 @@ bool cemu_int_op_gt(void *lhs, void *rhs);
 bool cemu_int_op_le(void *lhs, void *rhs);
 bool cemu_int_op_ge(void *lhs, void *rhs);
 cemu_t cemu_int();
-
-/* (int) */
-// void *cemu_clone_int(void *val);
-// void cemu_free_int(void *val);
-// int cemu_cmp_int(void *lhs, void *rhs);
-
-/* (char *) */
-// void *cemu_clone_pchar(void *val);
-// void cemu_free_pchar(void *val);
-// int cemu_cmp_pchar(void *lhs, void *rhs);
 
 #endif

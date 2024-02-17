@@ -8,7 +8,19 @@ static void map_erase(map_t *,  void *key);
 static void *map_find(map_t *,  void *key);
 static void map_extract(map_t *, vector_t *keys, vector_t *vals);
 
-map_t *new_map(cemu_t cemu_key, cemu_t cemu_val)
+cemu_t cemu_map()
+{
+  return (cemu_t){
+    cemu_map_size, cemu_map_new, NULL, NULL, cemu_map_delete
+  };
+}
+
+int cemu_map_size()
+{
+  return sizeof(map_t);
+}
+
+void *cemu_map_new(void *arg)
 {
   map_t *map = (map_t *)malloc(sizeof(map_t));
 
@@ -19,15 +31,26 @@ map_t *new_map(cemu_t cemu_key, cemu_t cemu_val)
   map->find = map_find;
   map->extract = map_extract;
 
-  map->_tr = new_treap(cemu_key, cemu_val);
+  map->_tr = cemu_treap_new(arg);
 
   return map;
 }
 
-void free_map(map_t *map)
+void cemu_map_delete(void *self)
 {
-  free_treap(map->_tr);
+  map_t *map = self;
+  delete_treap(map->_tr);
   free(map);
+}
+
+map_t *new_map(cemu_t cemu_key, cemu_t cemu_val)
+{
+  return cemu_map_new(&(treap_arg_t){cemu_key, cemu_val});
+}
+
+void delete_map(map_t *map)
+{
+  cemu_map_delete(map);
 }
 
 static int map_size(map_t *map)

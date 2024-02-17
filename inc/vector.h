@@ -1,3 +1,16 @@
+/**
+ * @file vector.h
+ * @author your name (you@domain.com)
+ * @brief 
+ * @version 0.1
+ * @date 2024-02-17
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ * cemu {
+ *  size, copy, dtor, assign
+ * }
+ */
 #ifndef VECTOR_H
 #define VECTOR_H
 
@@ -49,7 +62,14 @@ typedef struct vector_t
 
 } vector_t;
 
+int cemu_vector_size();
+void *cemu_vector_new(void *arg);
+void *cemu_vector_copy(void *other);
+void cemu_vector_dtor(void *self);
+void cemu_vector_delete(void *self);
+void cemu_vector_op_assign(void *dest, void *src);
 cemu_t cemu_vector();
+
 vector_t *new_vector(cemu_t cemu_int);
 void delete_vector(vector_t *);
 

@@ -1,3 +1,16 @@
+/**
+ * @file map.h
+ * @author your name (you@domain.com)
+ * @brief 
+ * @version 0.1
+ * @date 2024-02-17
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ * cemu {
+ *   same as treap
+ * }
+ */
 #ifndef MAP_H
 #define MAP_H
 
@@ -27,7 +40,12 @@ typedef struct map_t {
   treap_t *_tr;
 } map_t;
 
+int   cemu_map_size();
+void *cemu_map_new(void *arg);
+void  cemu_map_delete(void *self);
+cemu_t cemu_map();
+
 map_t *new_map(cemu_t cemu_key, cemu_t cemu_val);
-void free_map(map_t *);
+void delete_map(map_t *);
 
 #endif

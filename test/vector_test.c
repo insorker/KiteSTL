@@ -33,27 +33,27 @@ void test_int() {
 
   vector_t *vec = new_vector(cemu_int());
 
-  // for (int i = 0; i < 10; i++) {
-  //   vec->push_back(vec, &(int){i});
-  //   TEST_ASSERT(*(int *)vec->at(vec, i) == i, ERR_VECTOR_FIND);
-  // }
+  for (int i = 0; i < 10; i++) {
+    vec->push_back(vec, &(int){i});
+    TEST_ASSERT(*(int *)vec->at(vec, i) == i, ERR_VECTOR_FIND);
+  }
 
-  // for (int i = 0; i < 5; i++) {
-  //   vec->pop_back(vec);
-  // }
-  // TEST_ASSERT(vec->size(vec) == 5, ERR_VECTOR_ERASE);
+  for (int i = 0; i < 5; i++) {
+    vec->pop_back(vec);
+  }
+  TEST_ASSERT(vec->size(vec) == 5, ERR_VECTOR_ERASE);
 
-  // for (int i = 0; i < vec->size(vec); i++) {
-  //   TEST_ASSERT(*(int *)vec->at(vec, i) == i, ERR_VECTOR_FIND);
-  // }
+  for (int i = 0; i < vec->size(vec); i++) {
+    TEST_ASSERT(*(int *)vec->at(vec, i) == i, ERR_VECTOR_FIND);
+  }
 
-  // vec->erase(vec, 0);
-  // vec->erase(vec, 0);
-  // TEST_ASSERT(vec->size(vec) == 3, ERR_VECTOR_ERASE);
+  vec->erase(vec, 0);
+  vec->erase(vec, 0);
+  TEST_ASSERT(vec->size(vec) == 3, ERR_VECTOR_ERASE);
 
-  // for (int i = 0; i < vec->size(vec); i++) {
-  //   TEST_ASSERT(*(int *)vec->at(vec, i) == i + 2, ERR_VECTOR_FIND);
-  // }
+  for (int i = 0; i < vec->size(vec); i++) {
+    TEST_ASSERT(*(int *)vec->at(vec, i) == i + 2, ERR_VECTOR_FIND);
+  }
 
   delete_vector(vec);
 }
