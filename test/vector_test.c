@@ -10,6 +10,7 @@ const char *ERR_VECTOR_ERASE = "Error -> vector->erase";
 const char *ERR_VECTOR_SIZE = "Error -> vector->size";
 
 void test_int();
+void test_vector_int();
 void test_str();
 void test_struct();
 
@@ -18,6 +19,7 @@ int main() {
 
   TestFunction tf[] = {
     test_int,
+    test_vector_int,
     test_str,
     test_struct,
     NULL
@@ -56,6 +58,56 @@ void test_int() {
   }
 
   delete_vector(vec);
+}
+
+void test_vector_int()
+{
+  TEST_PRINT_FUNC();
+
+  vector_t *vec1 = new_vector(cemu_vector());
+
+  {
+    vector_t *vec2 = new_vector(cemu_int());
+    vec2->push_back(vec2, &(int){1});
+    vec2->push_back(vec2, &(int){2});
+    vec2->push_back(vec2, &(int){3});
+
+    vec1->push_back(vec1, vec2);
+
+    delete_vector(vec2);
+  }
+
+  {
+    vector_t *vec2 = new_vector(cemu_int());
+    vec2->push_back(vec2, &(int){4});
+    vec2->push_back(vec2, &(int){5});
+    vec2->push_back(vec2, &(int){6});
+
+    vec1->push_back(vec1, vec2);
+
+    delete_vector(vec2);
+  }
+
+  {
+    vector_t *vec2 = new_vector(cemu_int());
+    vec2->push_back(vec2, &(int){7});
+    vec2->push_back(vec2, &(int){8});
+    vec2->push_back(vec2, &(int){9});
+
+    vec1->push_back(vec1, vec2);
+
+    delete_vector(vec2);
+  }
+
+  for (int i = 0; i < 3; i++) {
+    vector_t *tmp = vec1->at(vec1, i);
+    for (int j = 0; j < 3; j++) {
+      int *val = tmp->at(tmp, j);
+      TEST_ASSERT(*val == i * 3 + j + 1, ERR_VECTOR_FIND);
+    }
+  }
+
+  delete_vector(vec1);
 }
 
 void test_str() {

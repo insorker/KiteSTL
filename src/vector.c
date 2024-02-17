@@ -27,7 +27,9 @@ static void vector_shrink(vector_t *);
 cemu_t cemu_vector()
 {
   return (cemu_t){
-    cemu_vector_size, cemu_vector_new, NULL, NULL, cemu_vector_delete
+    cemu_vector_size,
+    cemu_vector_new, cemu_vector_copy, cemu_vector_dtor, cemu_vector_delete, cemu_vector_op_assign,
+    NULL
   };
 }
 
