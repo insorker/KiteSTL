@@ -1,6 +1,7 @@
 #include "test.h"
 #include "map.h"
 #include "vector.h"
+#include "cemu_int.h"
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>

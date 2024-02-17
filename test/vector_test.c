@@ -1,5 +1,7 @@
 #include "test.h"
 #include "vector.h"
+#include "cemu_int.h"
+#include "cemu_str.h"
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
@@ -111,16 +113,16 @@ void test_vector_int()
 }
 
 void test_str() {
-  // TEST_PRINT_FUNC();
+  TEST_PRINT_FUNC();
 
-  // vector_t *vec = new_vector(vector_cemu_pchar);
+  vector_t *vec = new_vector(cemu_str());
 
-  // vec->push_back(vec, &(char *){"Hello"});
-  // TEST_ASSERT(strcmp(*(char **)vec->at(vec, 0), "Hello") == 0, ERR_VECTOR_INSERT);
-  // vec->push_back(vec, &(char *){"World"});
-  // TEST_ASSERT(strcmp(*(char **)vec->at(vec, 1), "World") == 0, ERR_VECTOR_INSERT);
+  vec->push_back(vec, &(char *){"Hello"});
+  TEST_ASSERT(strcmp(*(char **)vec->at(vec, 0), "Hello") == 0, ERR_VECTOR_INSERT);
+  vec->push_back(vec, &(char *){"World"});
+  TEST_ASSERT(strcmp(*(char **)vec->at(vec, 1), "World") == 0, ERR_VECTOR_INSERT);
 
-  // free_vector(vec);
+  delete_vector(vec);
 }
 
 // typedef struct people_t {
