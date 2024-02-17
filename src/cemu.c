@@ -4,6 +4,7 @@
 #include <assert.h>
 
 cemu_t cemu(
+  cemu_size_t size,
   cemu_new_t new,
   cemu_copy_t copy,
   cemu_dtor_t dtor,
@@ -21,8 +22,13 @@ cemu_t cemu(
   cemu_op_ge_t ge)
 {
   return (cemu_t){
-    new, copy, dtor, delete, assign, add, sub, mul, div, eq, ne, lt, gt, le, ge
+    size, new, copy, dtor, delete, assign, add, sub, mul, div, eq, ne, lt, gt, le, ge
   };
+}
+
+int cemu_int_size()
+{
+  return sizeof(int);
 }
 
 void *cemu_int_new(void *arg)
@@ -112,6 +118,7 @@ bool cemu_int_op_ge(void *lhs, void *rhs)
 cemu_t cemu_int()
 {
   return cemu(
+    cemu_int_size,
     cemu_int_new, cemu_int_copy, cemu_int_dtor, cemu_int_delete, cemu_int_op_assign,
     cemu_int_op_add, cemu_int_op_sub, cemu_int_op_mul, cemu_int_op_div,
     cemu_int_op_eq, cemu_int_op_ne,

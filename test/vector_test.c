@@ -31,7 +31,7 @@ int main() {
 void test_int() {
   TEST_PRINT_FUNC();
 
-  vector_t *vec = new_vector(vector_int());
+  vector_t *vec = new_vector(cemu_int());
 
   // for (int i = 0; i < 10; i++) {
   //   vec->push_back(vec, &(int){i});

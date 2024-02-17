@@ -27,7 +27,7 @@ typedef struct map_t {
   treap_t *_tr;
 } map_t;
 
-map_t *new_map(treap_cemu_t key, treap_cemu_t val);
+map_t *new_map(cemu_t cemu_key, cemu_t cemu_val);
 void free_map(map_t *);
 
 #endif

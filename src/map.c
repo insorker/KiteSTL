@@ -8,7 +8,7 @@ static void map_erase(map_t *,  void *key);
 static void *map_find(map_t *,  void *key);
 static void map_extract(map_t *, vector_t *keys, vector_t *vals);
 
-map_t *new_map(treap_cemu_t key, treap_cemu_t val)
+map_t *new_map(cemu_t cemu_key, cemu_t cemu_val)
 {
   map_t *map = (map_t *)malloc(sizeof(map_t));
 
@@ -19,7 +19,7 @@ map_t *new_map(treap_cemu_t key, treap_cemu_t val)
   map->find = map_find;
   map->extract = map_extract;
 
-  map->_tr = new_treap(key, val);
+  map->_tr = new_treap(cemu_key, cemu_val);
 
   return map;
 }

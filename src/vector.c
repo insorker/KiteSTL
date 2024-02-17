@@ -6,12 +6,13 @@
 
 #define VECTOR_DEFAULT_CAPACITY 3
 
+static int   cemu_vector_size();
 static void *cemu_vector_new(void *arg);
 static void  cemu_vector_delete(void *self);
 cemu_t cemu_vector()
 {
   return (cemu_t){
-    cemu_vector_new, NULL, NULL, cemu_vector_delete
+    cemu_vector_size, cemu_vector_new, NULL, NULL, cemu_vector_delete
   };
 }
 
@@ -27,9 +28,14 @@ static void vector_clear(vector_t *);
 static void vector_expand(vector_t *);
 static void vector_shrink(vector_t *);
 
-void *cemu_vector_new(void *arg)
+static int cemu_vector_size()
 {
-  vector_type_t vector_type = *(vector_type_t *)arg;
+  return sizeof(vector_t);
+}
+
+static void *cemu_vector_new(void *arg)
+{
+  cemu_t cemu = *(cemu_t *)arg;
   vector_t *vec = malloc(sizeof(vector_t));
 
   vec->size = vector_size;
@@ -46,15 +52,15 @@ void *cemu_vector_new(void *arg)
 
   vec->_size = 0;
   vec->_capacity = VECTOR_DEFAULT_CAPACITY;
-  vec->_tsize = vector_type.tsize;
+  vec->_tsize = cemu.size();
   vec->_elem = malloc(vec->_capacity * vec->_tsize);
 
-  vec->_cemu_elem = vector_type.cemu_elem;
+  vec->_cemu_elem = cemu;
 
   return vec;
 }
 
-static void  cemu_vector_delete(void *self)
+static void cemu_vector_delete(void *self)
 {
   vector_t *vec = self;
 
@@ -66,9 +72,9 @@ static void  cemu_vector_delete(void *self)
   free(vec);
 }
 
-vector_t *new_vector(vector_type_t vector_type)
+vector_t *new_vector(cemu_t cemu)
 {
-  return cemu_vector_new(&vector_type);
+  return cemu_vector_new(&cemu);
 }
 
 void delete_vector(vector_t *vec)
@@ -160,11 +166,4 @@ static void vector_shrink(vector_t *vec)
 
   vec->_capacity /= 2;
   vec->_elem = realloc(vec->_elem, vec->_capacity * vec->_tsize);
-}
-
-vector_type_t vector_int()
-{
-  return (vector_type_t){
-    sizeof(int), cemu_int()
-  };
 }

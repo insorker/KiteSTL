@@ -5,12 +5,6 @@
 #include <stdbool.h>
 #include "cemu.h"
 
-typedef struct
-{
-  size_t tsize;
-  cemu_t cemu_elem;
-} vector_type_t;
-
 typedef struct vector_t
 {
 /** public */
@@ -56,10 +50,7 @@ typedef struct vector_t
 } vector_t;
 
 cemu_t cemu_vector();
-
-vector_t *new_vector(vector_type_t vector_type);
+vector_t *new_vector(cemu_t cemu_int);
 void delete_vector(vector_t *);
-
-vector_type_t vector_int();
 
 #endif

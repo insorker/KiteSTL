@@ -13,13 +13,13 @@ typedef struct treap_node_t {
   int _size;
 } treap_node_t;
 
-typedef struct treap_cemu_t {
-  cemu_clone_t clone;
-  cemu_free_t free;
-  cemu_cmp_t cmp;
-} treap_cemu_t;
-typedef treap_cemu_t treap_cemu_key_t;
-typedef treap_cemu_t treap_cemu_val_t;
+// typedef struct treap_cemu_t {
+//   cemu_clone_t clone;
+//   cemu_free_t free;
+//   cemu_cmp_t cmp;
+// } treap_cemu_t;
+// typedef treap_cemu_t treap_cemu_key_t;
+// typedef treap_cemu_t treap_cemu_val_t;
 
 typedef struct treap_t {
 /** public **/
@@ -52,17 +52,19 @@ typedef struct treap_t {
   void (*zag)(struct treap_t *, treap_node_t **p);
 
 /** private **/
-  treap_cemu_key_t _cemu_key;
-  treap_cemu_val_t _cemu_val;
+  cemu_t _cemu_key;
+  cemu_t _cemu_val;
+  // treap_cemu_key_t _cemu_key;
+  // treap_cemu_val_t _cemu_val;
   treap_node_t *_root;
 } treap_t;
 
 treap_node_t *new_treap_node(void *key, void *val);
 void free_treap_node(treap_t *, treap_node_t *);
-treap_t *new_treap(treap_cemu_key_t key, treap_cemu_val_t val);
+treap_t *new_treap(cemu_t cemu_key, cemu_t cemu_val);
 void free_treap(treap_t *);
 
-extern treap_cemu_t treap_cemu_int;
-extern treap_cemu_t treap_cemu_pchar;
+// extern treap_cemu_t treap_cemu_int;
+// extern treap_cemu_t treap_cemu_pchar;
 
 #endif

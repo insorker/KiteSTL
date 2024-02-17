@@ -4,6 +4,14 @@
 #include <stdbool.h>
 
 /**
+ * @brief Emulate class size.
+ * 
+ * e.g. int: sizeof(int)
+ *      struct: sizeof(struct)
+ */
+typedef int (*cemu_size_t)();
+
+/**
  * @brief Emulate new.
  * 
  * 1. Use `malloc` to creatd an instance and return a malloc pointer.
@@ -107,6 +115,7 @@ typedef bool (*cemu_op_ge_t)(void *lhs, void *rhs);
  * 
  */
 typedef struct {
+  cemu_size_t size;
   cemu_new_t new;
   cemu_copy_t copy;
   cemu_dtor_t dtor;
@@ -125,6 +134,7 @@ typedef struct {
 } cemu_t;
 
 cemu_t cemu(
+  cemu_size_t size,
   cemu_new_t new,
   cemu_copy_t copy,
   cemu_dtor_t dtor,
@@ -146,6 +156,7 @@ cemu_t cemu(
  * @brief Emulate int class.
  * 
  */
+int   cemu_int_size();
 void *cemu_int_new(void *arg);
 void *cemu_int_copy(void *other);
 void  cemu_int_dtor(void *self);
