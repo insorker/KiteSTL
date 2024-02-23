@@ -38,7 +38,7 @@ void test_int() {
   vector_t *vec = new_vector(cemu_int());
 
   for (int i = 0; i < 10; i++) {
-    vec->push_back(vec, &(int){i});
+    vec->push_back(vec, &i);
     TEST_ASSERT(*(int *)vec->at(vec, i) == i, ERR_VECTOR_FIND);
   }
 
@@ -70,9 +70,9 @@ void test_vector_int()
 
   {
     vector_t *vec2 = new_vector(cemu_int());
-    vec2->push_back(vec2, &(int){1});
-    vec2->push_back(vec2, &(int){2});
-    vec2->push_back(vec2, &(int){3});
+    vec2->push_back(vec2, cemu_make(int, 1));
+    vec2->push_back(vec2, cemu_make(int, 2));
+    vec2->push_back(vec2, cemu_make(int, 3));
 
     vec1->push_back(vec1, vec2);
 
@@ -81,9 +81,9 @@ void test_vector_int()
 
   {
     vector_t *vec2 = new_vector(cemu_int());
-    vec2->push_back(vec2, &(int){4});
-    vec2->push_back(vec2, &(int){5});
-    vec2->push_back(vec2, &(int){6});
+    vec2->push_back(vec2, cemu_make(int, 4));
+    vec2->push_back(vec2, cemu_make(int, 5));
+    vec2->push_back(vec2, cemu_make(int, 6));
 
     vec1->push_back(vec1, vec2);
 
@@ -92,9 +92,9 @@ void test_vector_int()
 
   {
     vector_t *vec2 = new_vector(cemu_int());
-    vec2->push_back(vec2, &(int){7});
-    vec2->push_back(vec2, &(int){8});
-    vec2->push_back(vec2, &(int){9});
+    vec2->push_back(vec2, cemu_make(int, 7));
+    vec2->push_back(vec2, cemu_make(int, 8));
+    vec2->push_back(vec2, cemu_make(int, 9));
 
     vec1->push_back(vec1, vec2);
 
@@ -117,8 +117,8 @@ void test_str() {
 
   vector_t *vec = new_vector(cemu_str());
 
-  vec->push_back(vec, &(char *){"Hello"});
-  TEST_ASSERT(strcmp(*(char **)vec->at(vec, 0), "Hello") == 0, ERR_VECTOR_INSERT);
+  vec->push_back(vec, cemu_make(char *, "Hello"));
+  TEST_ASSERT(strcmp(cemu_get(char *, vec->at(vec, 0)), "Hello") == 0, ERR_VECTOR_INSERT);
   vec->push_back(vec, &(char *){"World"});
   TEST_ASSERT(strcmp(*(char **)vec->at(vec, 1), "World") == 0, ERR_VECTOR_INSERT);
 

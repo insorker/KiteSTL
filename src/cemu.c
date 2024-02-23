@@ -22,31 +22,3 @@ cemu_t cemu(
     size, new, copy, dtor, delete, assign, add, sub, mul, div, eq, ne, lt, gt, le, ge
   };
 }
-
-// void *cemu_clone_pchar(void *val)
-// {
-//   char **val_clone = (char **)malloc(sizeof(char *));
-
-//   // deep copy start
-//   int sz = strlen(*(char **)val) + 1;
-//   char *content_clone = (char *)malloc(sz * sizeof(char));
-//   strncpy(content_clone, *(char **)val, sz);
-//   // deep copy end
-
-//   *val_clone = content_clone;
-
-//   return val_clone;
-// }
-
-// void cemu_free_pchar(void *val)
-// {
-//   free(*(char **)val);
-// }
-
-// int cemu_cmp_pchar(void *lhs, void *rhs)
-// {
-//   char *le = *(char **)lhs;
-//   char *ri = *(char **)rhs;
-
-//   return strcmp(le, ri);
-// }

@@ -152,4 +152,7 @@ cemu_t cemu(
   cemu_op_ge_t ge
 );
 
+#define cemu_make(type, value) &(type){value}
+#define cemu_get(type, value) *(type*)(value)
+
 #endif
