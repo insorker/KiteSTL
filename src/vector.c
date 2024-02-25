@@ -6,15 +6,6 @@
 
 #define VECTOR_DEFAULT_CAPACITY 3
 
-static size_t vector_size(vector_t *);
-static bool vector_empty(vector_t *);
-static void *vector_at(vector_t *, size_t n);
-static void vector_insert(vector_t *, size_t n, void *val);
-static void vector_erase(vector_t *, size_t n);
-static void vector_push_back(vector_t *, void *val);
-static void vector_pop_back(vector_t *);
-static void vector_clear(vector_t *);
-
 static void vector_expand(vector_t *);
 static void vector_shrink(vector_t *);
 
@@ -125,7 +116,7 @@ void cemu_vector_op_assign(void *dest, void *src)
 
 /**
  * ====================
- * imitate func
+ * new / delete
  * ==================== 
  */
 
@@ -145,24 +136,24 @@ void delete_vector(vector_t *vec)
  * ==================== 
  */
 
-static size_t vector_size(vector_t *vec)
+size_t vector_size(vector_t *vec)
 {
   return vec->_size;
 }
 
-static bool vector_empty(vector_t *vec)
+bool vector_empty(vector_t *vec)
 {
   return vec->_size == 0;
 }
 
-static void *vector_at(vector_t *vec, size_t n)
+void *vector_at(vector_t *vec, size_t n)
 {
   assert(0 <= n && n < vec->_size);
 
   return vec->_elem + vec->_tsize * n;
 }
 
-static void vector_insert(vector_t *vec, size_t n, void *val)
+void vector_insert(vector_t *vec, size_t n, void *val)
 {
   assert(0 <= n && n <= vec->_size);
 
@@ -181,7 +172,7 @@ static void vector_insert(vector_t *vec, size_t n, void *val)
   vec->_size += 1;
 }
 
-static void vector_erase(vector_t *vec, size_t n)
+void vector_erase(vector_t *vec, size_t n)
 {
   assert(0 <= n && n < vec->_size);
 
@@ -196,17 +187,17 @@ static void vector_erase(vector_t *vec, size_t n)
   vec->shrink(vec);
 }
 
-static void vector_push_back(vector_t *vec, void *val)
+void vector_push_back(vector_t *vec, void *val)
 {
   vec->insert(vec, vec->_size, val);
 }
 
-static void vector_pop_back(vector_t *vec)
+void vector_pop_back(vector_t *vec)
 {
   vec->erase(vec, vec->_size - 1);
 }
 
-static void vector_clear(vector_t *vec)
+void vector_clear(vector_t *vec)
 {
   while (!vec->empty(vec)) {
     vec->pop_back(vec);

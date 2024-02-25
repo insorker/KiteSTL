@@ -16,6 +16,12 @@
 
 #include "treap.h"
 
+/**
+ * ====================
+ * class
+ * ==================== 
+ */
+
 typedef struct map_t {
 /** public **/
   /* Return container size */
@@ -40,12 +46,37 @@ typedef struct map_t {
   treap_t *_tr;
 } map_t;
 
+/**
+ * ====================
+ * cemu
+ * ==================== 
+ */
+
 int cemu_map_size();
 void *cemu_map_new(void *arg);
 void cemu_map_delete(void *self);
 cemu_t cemu_map();
 
+/**
+ * ====================
+ * new / delete
+ * ==================== 
+ */
+
 map_t *new_map(cemu_t cemu_key, cemu_t cemu_val, treap_key_cmp_t key_cmp);
 void delete_map(map_t *);
+
+/**
+ * ====================
+ * api
+ * ==================== 
+ */
+
+int map_size(map_t *);
+void map_clear(map_t *);
+void map_insert(map_t *,  void *key, void *val);
+void map_erase(map_t *,  void *key);
+void *map_find(map_t *,  void *key);
+void map_extract(map_t *, vector_t *keys, vector_t *vals);
 
 #endif

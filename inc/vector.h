@@ -18,6 +18,12 @@
 #include <stdbool.h>
 #include "cemu.h"
 
+/**
+ * ====================
+ * class
+ * ==================== 
+ */
+
 typedef struct vector_t
 {
 /** public */
@@ -62,6 +68,12 @@ typedef struct vector_t
 
 } vector_t;
 
+/**
+ * ====================
+ * cemu
+ * ==================== 
+ */
+
 int cemu_vector_size();
 void *cemu_vector_new(void *arg);
 void *cemu_vector_copy(void *other);
@@ -70,7 +82,28 @@ void cemu_vector_delete(void *self);
 void cemu_vector_op_assign(void *dest, void *src);
 cemu_t cemu_vector();
 
+/**
+ * ====================
+ * new / delete
+ * ==================== 
+ */
+
 vector_t *new_vector(cemu_t cemu_int);
 void delete_vector(vector_t *);
+
+/**
+ * ====================
+ * api
+ * ==================== 
+ */
+
+size_t vector_size(vector_t *);
+bool vector_empty(vector_t *);
+void *vector_at(vector_t *, size_t n);
+void vector_insert(vector_t *, size_t n, void *val);
+void vector_erase(vector_t *, size_t n);
+void vector_push_back(vector_t *, void *val);
+void vector_pop_back(vector_t *);
+void vector_clear(vector_t *);
 
 #endif
