@@ -1,7 +1,6 @@
 #include "cemu_int.h"
 #include <malloc.h>
 #include <string.h>
-#include <assert.h>
 
 int cemu_int_size()
 {
@@ -11,7 +10,10 @@ int cemu_int_size()
 void *cemu_int_new(void *arg)
 {
   int *val = malloc(sizeof(int));
-  assert(val != NULL);
+  if (val == NULL) {
+    return val;
+  }
+
   *val = *(int *)arg;
   return val;
 }

@@ -1,7 +1,6 @@
 #include "cemu_str.h"
 #include <malloc.h>
 #include <string.h>
-#include <assert.h>
 
 int cemu_str_size()
 {
@@ -14,12 +13,18 @@ void *cemu_str_new(void *arg)
   char **dest = malloc(sizeof(char *));
   int sz = strlen(*src) + 1;
 
-  assert(dest != NULL);
-  *dest = malloc(sz * sizeof(char));
-  assert(*dest != NULL);
-  strncpy(*dest, *src, sz);
-  assert((*dest)[sz - 1] == '\0');
-  
+  if (dest == NULL) {
+    return dest;
+  }
+  else {
+    *dest = malloc(sz * sizeof(char));
+    if (*dest == NULL) {
+      free(dest);
+      return NULL;
+    }
+    strncpy(*dest, *src, sz);
+  }
+
   return dest;
 }
 
@@ -55,11 +60,18 @@ void *cemu_str_op_add(void *lhs, void *rhs)
   int lsz = strlen(*lstr);
   int rsz = strlen(*rstr);
 
-  assert(res != NULL);
-  *res = malloc(lsz + rsz + 1);
-  assert(*res != NULL);
-  strncpy(*res, *lstr, lsz);
-  strncpy(*res + rsz, *rstr, rsz + 1);
+  if (res == NULL) {
+    return res;
+  }
+  else {
+    *res = malloc(lsz + rsz + 1);
+    if (*res == NULL) {
+      free(res);
+      return NULL;
+    }
+    strncpy(*res, *lstr, lsz);
+    strncpy(*res + rsz, *rstr, rsz + 1);
+  }
   
   return res;
 }

@@ -17,9 +17,11 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: "Build"
-        run: "make"
+        run: "mkdir build"
+        run: "cmake -DCMAKE_BUILD_TYPE:STRING=Release -S. -B./build"
+        run: "cmake --build ./build --config Release --target KiteSTL -j 22 --"
 
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "lib/*.so"
+          artifacts: "lib/*.so,inc"
           tag: "0.2.8"

@@ -3,7 +3,6 @@
 #include <malloc.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 
 static int treap_key_cmp(treap_t *self, void *lhs, void *rhs);
 static void treap_pushup(treap_t *, treap_node_t **p);
@@ -224,9 +223,8 @@ static int treap_key_cmp(treap_t *self, void *lhs, void *rhs)
       return -1;
     }
   }
-  else {
-    assert(0);
-  }
+
+  return 0;
 }
 
 static void treap_pushup(treap_t *tr, treap_node_t **p)
@@ -236,8 +234,6 @@ static void treap_pushup(treap_t *tr, treap_node_t **p)
   (*p)->_size = 1;
   if ((*p)->_le) (*p)->_size += (*p)->_le->_size;
   if ((*p)->_ri) (*p)->_size += (*p)->_ri->_size;
-
-  assert((*p)->_size >= 0);
 }
 
 static void treap_zig(treap_t *tr, treap_node_t **p)

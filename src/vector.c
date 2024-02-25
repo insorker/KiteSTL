@@ -148,14 +148,18 @@ bool vector_empty(vector_t *vec)
 
 void *vector_at(vector_t *vec, size_t n)
 {
-  assert(0 <= n && n < vec->_size);
+  if (n >= vec->_size) {
+    return NULL;
+  }
 
   return vec->_elem + vec->_tsize * n;
 }
 
 void vector_insert(vector_t *vec, size_t n, void *val)
 {
-  assert(0 <= n && n <= vec->_size);
+  if (n > vec->_size) {
+    return;
+  }
 
   vec->expand(vec);
   for (size_t i = vec->_size; i > n; i--) {
@@ -174,7 +178,9 @@ void vector_insert(vector_t *vec, size_t n, void *val)
 
 void vector_erase(vector_t *vec, size_t n)
 {
-  assert(0 <= n && n < vec->_size);
+  if (n > vec->_size) {
+    return;
+  }
 
   for (size_t i = n + 1; i < vec->_size; i++) {
     void *elem_next = vec->_elem + vec->_tsize * i;
@@ -207,7 +213,7 @@ void vector_clear(vector_t *vec)
 static void vector_expand(vector_t *vec)
 {
   if (vec->_size < vec->_capacity) return;
-  assert(vec->_capacity * 2 >= vec->_capacity);
+  // assert(vec->_capacity * 2 >= vec->_capacity);
 
   vec->_capacity *= 2;
   vec->_elem = realloc(vec->_elem, vec->_capacity * vec->_tsize);

@@ -1,5 +1,13 @@
+cmake_minimum_required(VERSION 2.8.12)
+
 project(KiteSTL)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -Wall -Werror -g")
+
+add_compile_options(
+  "-fsanitize=address"
+  "-Wall" "-Werror"
+  "$<$<CONFIG:DEBUG>:-O0;-g;-ggdb>"
+)
+add_link_options("-fsanitize=address")
 
 ####################
 # include
@@ -17,11 +25,16 @@ add_library(treap src/treap.c)
 add_library(vector src/vector.c)
 
 ####################
+# lib
+####################
+file(GLOB LIB_SRC ${CMAKE_SOURCE_DIR}/src/*.c)
+ADD_LIBRARY(KiteSTL SHARED ${LIB_SRC})
+
+####################
 # test
 ####################
 enable_testing()
 
-# test vector
 add_executable(vector_test test/vector_test.c)
 target_link_libraries(vector_test PRIVATE vector cemu_int cemu_str cemu)
 add_test(NAME vector_test COMMAND vector_test)

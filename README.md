@@ -7,11 +7,14 @@ Link the dynamic library "libKiteSTL.so".
 ## Build
 
 ```
+mkdir build
+cd build
+cmake ..
 make
 ```
 
 ## Test
 
 ```
-make test
+./build/xxx_test
 ```
