@@ -22,7 +22,10 @@ jobs:
       - name: "Build"
         run: "cmake --build ./build --config Release --target KiteSTL -j 22 --"
 
+      - name: "Pack"
+        run: "tar -cf archive.tar build/*.so inc"
+
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "lib/*.so,inc"
-          tag: "0.2.8"
+          artifacts: "archive.tar"
+          tag: "0.2.9"
