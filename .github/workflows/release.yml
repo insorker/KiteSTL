@@ -16,9 +16,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: "Build"
-        run: "mkdir build"
+      - name: "Config"
         run: "cmake -DCMAKE_BUILD_TYPE:STRING=Release -S. -B./build"
+
+      - name: "Build"
         run: "cmake --build ./build --config Release --target KiteSTL -j 22 --"
 
       - uses: ncipollo/release-action@v1
