@@ -28,4 +28,4 @@ jobs:
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "archive.tar.gz"
-          tag: "0.3.1"
+          tag: "0.3.0"

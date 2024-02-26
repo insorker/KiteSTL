@@ -3,9 +3,8 @@ cmake_minimum_required(VERSION 2.8.12)
 project(KiteSTL)
 
 add_compile_options(
-  "-fsanitize=address"
-  "-Wall" "-Werror"
-  "$<$<CONFIG:DEBUG>:-O0;-g;-ggdb>"
+  "-O3"
+  "$<$<CONFIG:DEBUG>:-Wall;-Werror;-fsanitize=address;-O0;-g;-ggdb>"
 )
 add_link_options("-fsanitize=address")
 
