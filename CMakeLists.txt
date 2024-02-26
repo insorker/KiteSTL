@@ -6,7 +6,7 @@ add_compile_options(
   "-O3"
   "$<$<CONFIG:DEBUG>:-Wall;-Werror;-fsanitize=address;-O0;-g;-ggdb>"
 )
-add_link_options("-fsanitize=address")
+add_link_options("$<$<CONFIG:DEBUG>:-fsanitize=address>")
 
 ####################
 # include
