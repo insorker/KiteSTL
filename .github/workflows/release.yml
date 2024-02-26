@@ -23,9 +23,9 @@ jobs:
         run: "cmake --build ./build --config Release --target KiteSTL -j 22 --"
 
       - name: "Pack"
-        run: "tar -cf archive.tar build/*.so inc"
+        run: "tar czf archive.tar.gz -C build/ libKiteSTL.so -C ../inc ."
 
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "archive.tar"
-          tag: "0.2.9"
+          tag: "0.3.0"
