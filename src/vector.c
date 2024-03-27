@@ -48,6 +48,11 @@ int cemu_vector_size()
 void *cemu_vector_new(void *arg)
 {
   cemu_t cemu = *(cemu_t *)arg;
+
+  if (!cemu.size || !cemu.dtor || !cemu.assign) {
+    return NULL;
+  }
+
   vector_t *vec = malloc(sizeof(vector_t));
 
   vector_fn_init(vec);
@@ -76,7 +81,7 @@ void *cemu_vector_copy(void *other)
 
   vec->_cemu_elem = vec_other->_cemu_elem;
 
-  for (size_t i = 0; i < vec->_size; i++) {
+  for (int i = 0; i < vec->_size; i++) {
     void *elem = vec->_elem + vec->_tsize * i;
     void *elem_other = vec_other->_elem + vec_other->_tsize * i;
 
@@ -90,7 +95,7 @@ void cemu_vector_dtor(void *self)
 {
   vector_t *vec = self;
 
-  for (size_t i = 0; i < vec->_size; i++) {
+  for (int i = 0; i < vec->_size; i++) {
     void *elem = vec->_elem + vec->_tsize * i;
     vec->_cemu_elem.dtor(elem);
   }
@@ -132,7 +137,7 @@ void delete_vector(vector_t *vec)
  * ==================== 
  */
 
-size_t vector_size(vector_t *vec)
+int vector_size(vector_t *vec)
 {
   return vec->_size;
 }
@@ -142,7 +147,7 @@ bool vector_empty(vector_t *vec)
   return vec->_size == 0;
 }
 
-void *vector_at(vector_t *vec, size_t n)
+void *vector_at(vector_t *vec, int n)
 {
   if (n >= vec->_size) {
     return NULL;
@@ -151,14 +156,14 @@ void *vector_at(vector_t *vec, size_t n)
   return vec->_elem + vec->_tsize * n;
 }
 
-void vector_insert(vector_t *vec, size_t n, void *val)
+void vector_insert(vector_t *vec, int n, void *val)
 {
   if (n > vec->_size) {
     return;
   }
 
   vec->expand(vec);
-  for (size_t i = vec->_size; i > n; i--) {
+  for (int i = vec->_size; i > n; i--) {
     void *elem_next = vec->_elem + vec->_tsize * i;
     void *elem_prev = vec->_elem + vec->_tsize * (i - 1);
 
@@ -172,13 +177,13 @@ void vector_insert(vector_t *vec, size_t n, void *val)
   vec->_size += 1;
 }
 
-void vector_erase(vector_t *vec, size_t n)
+void vector_erase(vector_t *vec, int n)
 {
   if (n > vec->_size) {
     return;
   }
 
-  for (size_t i = n + 1; i < vec->_size; i++) {
+  for (int i = n + 1; i < vec->_size; i++) {
     void *elem_next = vec->_elem + vec->_tsize * i;
     void *elem_prev = vec->_elem + vec->_tsize * (i - 1);
 
@@ -209,7 +214,7 @@ void vector_clear(vector_t *vec)
 static void vector_expand(vector_t *vec)
 {
   if (vec->_size < vec->_capacity) return;
-  // assert(vec->_capacity * 2 >= vec->_capacity);
+  if (vec->_capacity * 2 < 0) return;
 
   vec->_capacity *= 2;
   vec->_elem = realloc(vec->_elem, vec->_capacity * vec->_tsize);

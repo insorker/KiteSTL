@@ -30,6 +30,18 @@ int cemu_treap_size()
 void *cemu_treap_new(void *arg)
 {
   treap_arg_t *tr_arg = arg;
+  cemu_t cemu_key = tr_arg->cemu_key;
+  cemu_t cemu_val = tr_arg->cemu_val;
+  if (!cemu_key.copy || !cemu_key.delete) {
+    return NULL;
+  }
+  else if (!cemu_val.copy || !cemu_val.delete) {
+    return NULL;
+  }
+  else if (!tr_arg->key_cmp && (!cemu_key.eq || !cemu_key.gt)) {
+    return NULL;
+  }
+
   treap_t *tr = malloc(sizeof(treap_t));
 
   tr->size = treap_size;

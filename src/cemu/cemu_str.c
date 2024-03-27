@@ -14,7 +14,7 @@ void *cemu_str_new(void *arg)
   int sz = strlen(*src) + 1;
 
   if (dest == NULL) {
-    return dest;
+    return NULL;
   }
   else {
     *dest = malloc(sz * sizeof(char));

@@ -10,11 +10,14 @@ int cemu_int_size()
 void *cemu_int_new(void *arg)
 {
   int *val = malloc(sizeof(int));
+
   if (val == NULL) {
-    return val;
+    return NULL;
+  }
+  else {
+    *val = *(int *)arg;
   }
 
-  *val = *(int *)arg;
   return val;
 }
 

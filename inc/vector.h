@@ -27,19 +27,19 @@
 typedef struct vector_t {
 /** public */
   /* Return size */
-  size_t (*size)(struct vector_t *);
+  int (*size)(struct vector_t *);
 
   /* Test whether vector is empty */
   bool (*empty)(struct vector_t *);
 
   /* Access element */
-  void *(*at)(struct vector_t *, size_t n);
+  void *(*at)(struct vector_t *, int n);
 
   /* Insert elements */
-  void (*insert)(struct vector_t *, size_t n, void *val);
+  void (*insert)(struct vector_t *, int n, void *val);
 
   /* Erase elements */
-  void (*erase)(struct vector_t *, size_t n);
+  void (*erase)(struct vector_t *, int n);
 
   /* 	Add element at the end */
   void (*push_back)(struct vector_t *, void *val);
@@ -58,9 +58,9 @@ typedef struct vector_t {
   void (*shrink)(struct vector_t *);
 
 /** private */
-  size_t _size;
-  size_t _capacity;
-  size_t _tsize;
+  int _size;
+  int _capacity;
+  int _tsize;
   void *_elem;
 
   cemu_t _cemu_elem;
@@ -96,11 +96,11 @@ void delete_vector(vector_t *);
  * ==================== 
  */
 
-size_t vector_size(vector_t *);
+int vector_size(vector_t *);
 bool vector_empty(vector_t *);
-void *vector_at(vector_t *, size_t n);
-void vector_insert(vector_t *, size_t n, void *val);
-void vector_erase(vector_t *, size_t n);
+void *vector_at(vector_t *, int n);
+void vector_insert(vector_t *, int n, void *val);
+void vector_erase(vector_t *, int n);
 void vector_push_back(vector_t *, void *val);
 void vector_pop_back(vector_t *);
 void vector_clear(vector_t *);
