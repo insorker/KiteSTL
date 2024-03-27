@@ -8,6 +8,22 @@
 
 static void vector_expand(vector_t *);
 static void vector_shrink(vector_t *);
+static void vector_fn_init(vector_t *);
+
+static void vector_fn_init(vector_t *vec)
+{
+  vec->size = vector_size;
+  vec->empty = vector_empty;
+  vec->at = vector_at;
+  vec->insert = vector_insert;
+  vec->erase = vector_erase;
+  vec->push_back = vector_push_back;
+  vec->pop_back = vector_pop_back;
+  vec->clear = vector_clear;
+
+  vec->expand = vector_expand;
+  vec->shrink = vector_shrink;
+}
 
 /**
  * ====================
@@ -34,17 +50,7 @@ void *cemu_vector_new(void *arg)
   cemu_t cemu = *(cemu_t *)arg;
   vector_t *vec = malloc(sizeof(vector_t));
 
-  vec->size = vector_size;
-  vec->empty = vector_empty;
-  vec->at = vector_at;
-  vec->insert = vector_insert;
-  vec->erase = vector_erase;
-  vec->push_back = vector_push_back;
-  vec->pop_back = vector_pop_back;
-  vec->clear = vector_clear;
-
-  vec->expand = vector_expand;
-  vec->shrink = vector_shrink;
+  vector_fn_init(vec);
 
   vec->_size = 0;
   vec->_capacity = VECTOR_DEFAULT_CAPACITY;
@@ -61,17 +67,7 @@ void *cemu_vector_copy(void *other)
   vector_t *vec_other = other;
   vector_t *vec = malloc(sizeof(vector_t));
 
-  vec->size = vector_size;
-  vec->empty = vector_empty;
-  vec->at = vector_at;
-  vec->insert = vector_insert;
-  vec->erase = vector_erase;
-  vec->push_back = vector_push_back;
-  vec->pop_back = vector_pop_back;
-  vec->clear = vector_clear;
-
-  vec->expand = vector_expand;
-  vec->shrink = vector_shrink;
+  vector_fn_init(vec);
 
   vec->_size = vec_other->_size;
   vec->_capacity = vec_other->_capacity;

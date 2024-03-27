@@ -12,13 +12,15 @@ add_link_options("$<$<CONFIG:DEBUG>:-fsanitize=address>")
 # include
 ####################
 include_directories(${CMAKE_SOURCE_DIR}/inc)
+include_directories(${CMAKE_SOURCE_DIR}/inc/cemu)
 
 ####################
 # source
 ####################
-add_library(cemu src/cemu.c)
-add_library(cemu_int src/cemu_int.c)
-add_library(cemu_str src/cemu_str.c)
+
+add_library(cemu src/cemu/cemu.c)
+add_library(cemu_int src/cemu/cemu_int.c)
+add_library(cemu_str src/cemu/cemu_str.c)
 add_library(map src/map.c)
 add_library(treap src/treap.c)
 add_library(vector src/vector.c)
@@ -26,7 +28,10 @@ add_library(vector src/vector.c)
 ####################
 # lib
 ####################
-file(GLOB LIB_SRC ${CMAKE_SOURCE_DIR}/src/*.c)
+file(GLOB CEMU_SRC ${CMAKE_SOURCE_DIR}/src/cemu/*.c)
+file(GLOB STL_SRC ${CMAKE_SOURCE_DIR}/src/*.c)
+set(LIB_SRC ${CEMU_SRC} ${STL_SRC})
+
 ADD_LIBRARY(KiteSTL SHARED ${LIB_SRC})
 
 ####################

@@ -1,6 +1,6 @@
 /**
  * @file vector.h
- * @author your name (you@domain.com)
+ * @author insorker (you@domain.com)
  * @brief 
  * @version 0.1
  * @date 2024-02-17
@@ -24,8 +24,7 @@
  * ==================== 
  */
 
-typedef struct vector_t
-{
+typedef struct vector_t {
 /** public */
   /* Return size */
   size_t (*size)(struct vector_t *);
@@ -88,7 +87,7 @@ cemu_t cemu_vector();
  * ==================== 
  */
 
-vector_t *new_vector(cemu_t cemu_int);
+vector_t *new_vector(cemu_t cemu);
 void delete_vector(vector_t *);
 
 /**
