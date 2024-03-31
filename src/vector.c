@@ -8,22 +8,6 @@
 
 static void vector_expand(vector_t *);
 static void vector_shrink(vector_t *);
-static void vector_fn_init(vector_t *);
-
-static void vector_fn_init(vector_t *vec)
-{
-  vec->size = vector_size;
-  vec->empty = vector_empty;
-  vec->at = vector_at;
-  vec->insert = vector_insert;
-  vec->erase = vector_erase;
-  vec->push_back = vector_push_back;
-  vec->pop_back = vector_pop_back;
-  vec->clear = vector_clear;
-
-  vec->expand = vector_expand;
-  vec->shrink = vector_shrink;
-}
 
 /**
  * ====================
@@ -31,88 +15,117 @@ static void vector_fn_init(vector_t *vec)
  * ==================== 
  */
 
-cemu_t cemu_vector()
-{
-  return (cemu_t){
-    cemu_vector_size,
-    cemu_vector_new, cemu_vector_copy, cemu_vector_dtor, cemu_vector_delete, cemu_vector_op_assign,
-    NULL
-  };
-}
+static cemu_data_t cemu_vector_data = { sizeof(vector_t) };
 
-int cemu_vector_size()
+static void cemu_vector_dtor(cemu_data_t data, void *self)
 {
-  return sizeof(vector_t);
-}
-
-void *cemu_vector_new(void *arg)
-{
-  cemu_t cemu = *(cemu_t *)arg;
-
-  if (!cemu.size || !cemu.dtor || !cemu.assign) {
-    return NULL;
+  if (self == NULL) {
+    return;
   }
 
-  vector_t *vec = malloc(sizeof(vector_t));
-
-  vector_fn_init(vec);
-
-  vec->_size = 0;
-  vec->_capacity = VECTOR_DEFAULT_CAPACITY;
-  vec->_tsize = cemu.size();
-  vec->_elem = malloc(vec->_capacity * vec->_tsize);
-
-  vec->_cemu_elem = cemu;
-
-  return vec;
-}
-
-void *cemu_vector_copy(void *other)
-{
-  vector_t *vec_other = other;
-  vector_t *vec = malloc(sizeof(vector_t));
-
-  vector_fn_init(vec);
-
-  vec->_size = vec_other->_size;
-  vec->_capacity = vec_other->_capacity;
-  vec->_tsize = vec_other->_tsize;
-  vec->_elem = malloc(vec->_capacity * vec->_tsize);
-
-  vec->_cemu_elem = vec_other->_cemu_elem;
-
-  for (int i = 0; i < vec->_size; i++) {
-    void *elem = vec->_elem + vec->_tsize * i;
-    void *elem_other = vec_other->_elem + vec_other->_tsize * i;
-
-    memcpy(elem, elem_other, vec->_cemu_elem.size());
-  }
-
-  return vec;
-}
-
-void cemu_vector_dtor(void *self)
-{
   vector_t *vec = self;
 
   for (int i = 0; i < vec->_size; i++) {
     void *elem = vec->_elem + vec->_tsize * i;
-    vec->_cemu_elem.dtor(elem);
+    cemu_impl(vec->_cemu_elem, dtor, elem);
   }
   free(vec->_elem);
 }
 
-void cemu_vector_delete(void *self)
+static void cemu_vector_delete(cemu_data_t data, void *self)
 {
-  cemu_vector_dtor(self);
+  if (self == NULL) {
+    return;
+  }
+
+  cemu_vector_dtor(data, self);
   free(self);
 }
 
-void cemu_vector_op_assign(void *dest, void *src)
+
+static void cemu_vector_assign(cemu_data_t data, void *dest, void *src)
 {
-  void *copy = cemu_vector_copy(src);
-  memcpy(dest, copy, cemu_vector_size());
-  free(copy);
+  if (dest == NULL || src == NULL) {
+    return;
+  }
+
+  vector_t *vec_dest = dest;
+  vector_t *vec_src = src;
+  int elem_size = vec_src->_tsize;
+
+  cemu_vector_dtor(data, dest);
+  memcpy(vec_dest, vec_src, sizeof(vector_t));
+
+  vec_dest->_elem = malloc(vec_dest->_capacity * elem_size);
+  for (int i = 0; i < vec_dest->_size; i++) {
+    void *elem_dest = vec_dest->_elem + elem_size * i;
+    void *elem_src = vec_src->_elem + elem_size * i;
+
+    memcpy(elem_dest, elem_src, elem_size);
+  }
+}
+
+static void *cemu_vector_copy(cemu_data_t data, void *src)
+{
+  if (src == NULL) {
+    return NULL;
+  }
+
+  vector_t *vec_dest = malloc(sizeof(vector_t));
+  vector_t *vec_src = src;
+  int elem_size = vec_src->_tsize;
+
+  memcpy(vec_dest, vec_src, sizeof(vector_t));
+
+  vec_dest->_elem = malloc(vec_dest->_capacity * elem_size);
+  for (int i = 0; i < vec_dest->_size; i++) {
+    void *elem_dest = vec_dest->_elem + elem_size * i;
+    void *elem_src = vec_src->_elem + elem_size * i;
+
+    memcpy(elem_dest, elem_src, elem_size);
+  }
+
+  return vec_dest;
+}
+
+static int cemu_vector_cmp(cemu_data_t data, void *lhs, void *rhs)
+{
+  vector_t *vec_lhs = lhs;
+  vector_t *vec_rhs = rhs;
+  cemu_t cemu_elem = vec_lhs->_cemu_elem;
+
+  if (vec_lhs->_size != vec_rhs->_size) {
+    return vec_lhs->_size > vec_rhs->_size;
+  }
+  
+  int size = vec_lhs->_size;
+  int elem_size = vec_lhs->_tsize;
+  for (int i = 0; i < size * elem_size; i += elem_size) {
+    void *elem_lhs = vec_lhs->_elem + i;
+    void *elem_rhs = vec_lhs->_elem + i;
+    int result = cemu_impl(cemu_elem, cmp, elem_lhs, elem_rhs);
+
+    if (result != 0) {
+      return result;
+    }
+  }
+
+  return 0;
+}
+
+cemu_t cemu_vector()
+{
+  cemu_impl_t impl = {
+    NULL,
+    NULL,
+    cemu_vector_dtor,
+    cemu_vector_delete,
+    cemu_vector_assign,
+    cemu_vector_copy,
+    cemu_vector_cmp
+  };
+
+  return cemu(vector_t, impl);
 }
 
 /**
@@ -121,14 +134,22 @@ void cemu_vector_op_assign(void *dest, void *src)
  * ==================== 
  */
 
-vector_t *new_vector(cemu_t cemu)
+vector_t *new_vector(cemu_t cemu_elem)
 {
-  return cemu_vector_new(&cemu);
+  vector_t *vec = malloc(sizeof(vector_t));
+
+  vec->_size = 0;
+  vec->_tsize = cemu_impl(cemu_elem, size);
+  vec->_capacity = VECTOR_DEFAULT_CAPACITY;
+  vec->_cemu_elem = cemu_elem;
+  vec->_elem = malloc(vec->_capacity * cemu_impl(cemu_elem, size));
+
+  return vec;
 }
 
-void delete_vector(vector_t *vec)
+void delete_vector(vector_t *self)
 {
-  cemu_vector_delete(vec);
+  cemu_vector_delete(cemu_vector_data, self);
 }
 
 /**
@@ -137,94 +158,95 @@ void delete_vector(vector_t *vec)
  * ==================== 
  */
 
-int vector_size(vector_t *vec)
+int vector_size(vector_t *self)
 {
-  return vec->_size;
+  return self->_size;
 }
 
-bool vector_empty(vector_t *vec)
+bool vector_empty(vector_t *self)
 {
-  return vec->_size == 0;
+  return self->_size == 0;
 }
 
-void *vector_at(vector_t *vec, int n)
+void *vector_at(vector_t *self, int n)
 {
-  if (n >= vec->_size) {
+  if (n >= self->_size) {
     return NULL;
   }
 
-  return vec->_elem + vec->_tsize * n;
+  return self->_elem + self->_tsize * n;
 }
 
-void vector_insert(vector_t *vec, int n, void *val)
+void vector_insert(vector_t *self, int n, void *value)
 {
-  if (n > vec->_size) {
+  if (n < 0 || n > self->_size) {
     return;
   }
 
-  vec->expand(vec);
-  for (int i = vec->_size; i > n; i--) {
-    void *elem_next = vec->_elem + vec->_tsize * i;
-    void *elem_prev = vec->_elem + vec->_tsize * (i - 1);
+  vector_expand(self);
+  for (int i = self->_size; i > n; i--) {
+    void *elem_next = self->_elem + self->_tsize * i;
+    void *elem_prev = self->_elem + self->_tsize * (i - 1);
 
-    memcpy(elem_next, elem_prev, vec->_tsize);
+    memcpy(elem_next, elem_prev, self->_tsize);
   }
+  void *dest = self->_elem + self->_tsize * n;
+  void *src = cemu_impl(self->_cemu_elem, copy, value);
+  memcpy(dest, src, self->_tsize);
+  free(src);
 
-  void *dest = vec->_elem + vec->_tsize * n;
-  void *src = val;
-  vec->_cemu_elem.assign(dest, src);
-
-  vec->_size += 1;
+  self->_size += 1;
 }
 
-void vector_erase(vector_t *vec, int n)
+void vector_erase(vector_t *self, int n)
 {
-  if (n > vec->_size) {
+  if (n < 0 || n >= self->_size) {
     return;
   }
 
-  for (int i = n + 1; i < vec->_size; i++) {
-    void *elem_next = vec->_elem + vec->_tsize * i;
-    void *elem_prev = vec->_elem + vec->_tsize * (i - 1);
+  cemu_impl(self->_cemu_elem, dtor, self->_elem + self->_tsize * n);
+  for (int i = n + 1; i < self->_size; i++) {
+    void *elem_next = self->_elem + self->_tsize * i;
+    void *elem_prev = self->_elem + self->_tsize * (i - 1);
 
-    memcpy(elem_prev, elem_next, vec->_tsize);
+    memcpy(elem_prev, elem_next, self->_tsize);
   }
 
-  vec->_size -= 1;
-  vec->shrink(vec);
+  self->_size -= 1;
+  vector_shrink(self);
 }
 
-void vector_push_back(vector_t *vec, void *val)
+void vector_push_back(vector_t *self, void *value)
 {
-  vec->insert(vec, vec->_size, val);
+  vector_insert(self, self->_size, value);
 }
 
-void vector_pop_back(vector_t *vec)
+void vector_pop_back(vector_t *self)
 {
-  vec->erase(vec, vec->_size - 1);
+  vector_erase(self, self->_size - 1);
 }
 
-void vector_clear(vector_t *vec)
+void vector_clear(vector_t *self)
 {
-  while (!vec->empty(vec)) {
-    vec->pop_back(vec);
+  while (!vector_empty(self)) {
+    vector_pop_back(self);
   }
 }
 
-static void vector_expand(vector_t *vec)
+static void vector_expand(vector_t *self)
 {
-  if (vec->_size < vec->_capacity) return;
-  if (vec->_capacity * 2 < 0) return;
+  if (self->_size < self->_capacity) return;
+  if (self->_capacity * 2 < 0) return;
 
-  vec->_capacity *= 2;
-  vec->_elem = realloc(vec->_elem, vec->_capacity * vec->_tsize);
+  self->_capacity *= 2;
+  self->_elem = realloc(self->_elem, self->_capacity * self->_tsize);
 }
 
-static void vector_shrink(vector_t *vec)
+static void vector_shrink(vector_t *self)
 {
-  if (vec->_capacity == VECTOR_DEFAULT_CAPACITY) return;
-  if (vec->_capacity < vec->_size * 2) return;
+  if (self->_capacity == VECTOR_DEFAULT_CAPACITY) return;
+  if (self->_capacity <= self->_size * 2) return;
 
-  vec->_capacity /= 2;
-  vec->_elem = realloc(vec->_elem, vec->_capacity * vec->_tsize);
+  self->_capacity /= 2;
+  self->_elem = realloc(self->_elem, self->_capacity * self->_tsize);
 }

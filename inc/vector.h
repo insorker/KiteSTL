@@ -24,47 +24,13 @@
  * ==================== 
  */
 
-typedef struct vector_t {
-/** public */
-  /* Return size */
-  int (*size)(struct vector_t *);
-
-  /* Test whether vector is empty */
-  bool (*empty)(struct vector_t *);
-
-  /* Access element */
-  void *(*at)(struct vector_t *, int n);
-
-  /* Insert elements */
-  void (*insert)(struct vector_t *, int n, void *val);
-
-  /* Erase elements */
-  void (*erase)(struct vector_t *, int n);
-
-  /* 	Add element at the end */
-  void (*push_back)(struct vector_t *, void *val);
-
-  /*	Delete last element */
-  void (*pop_back)(struct vector_t *);
-
-  /* 	Clear content */
-  void (*clear)(struct vector_t *);
-
-/** protected */
-  /* Expand the capacity */
-  void (*expand)(struct vector_t *);
-
-  /* Shrink the capacity */
-  void (*shrink)(struct vector_t *);
-
-/** private */
+typedef struct {
   int _size;
-  int _capacity;
   int _tsize;
-  void *_elem;
+  int _capacity;
 
   cemu_t _cemu_elem;
-
+  void *_elem;
 } vector_t;
 
 /**
@@ -73,12 +39,6 @@ typedef struct vector_t {
  * ==================== 
  */
 
-int cemu_vector_size();
-void *cemu_vector_new(void *arg);
-void *cemu_vector_copy(void *other);
-void cemu_vector_dtor(void *self);
-void cemu_vector_delete(void *self);
-void cemu_vector_op_assign(void *dest, void *src);
 cemu_t cemu_vector();
 
 /**
@@ -87,7 +47,7 @@ cemu_t cemu_vector();
  * ==================== 
  */
 
-vector_t *new_vector(cemu_t cemu);
+vector_t *new_vector(cemu_t elem_cemu);
 void delete_vector(vector_t *);
 
 /**
@@ -96,13 +56,13 @@ void delete_vector(vector_t *);
  * ==================== 
  */
 
-int vector_size(vector_t *);
-bool vector_empty(vector_t *);
+int   vector_size(vector_t *);
+bool  vector_empty(vector_t *);
 void *vector_at(vector_t *, int n);
-void vector_insert(vector_t *, int n, void *val);
-void vector_erase(vector_t *, int n);
-void vector_push_back(vector_t *, void *val);
-void vector_pop_back(vector_t *);
-void vector_clear(vector_t *);
+void  vector_insert(vector_t *, int n, void *val);
+void  vector_erase(vector_t *, int n);
+void  vector_push_back(vector_t *, void *val);
+void  vector_pop_back(vector_t *);
+void  vector_clear(vector_t *);
 
 #endif
