@@ -31,18 +31,15 @@ typedef struct treap_node_t {
   int _size;
 } treap_node_t;
 
-typedef int (*treap_key_cmp_t)(void *lhs, void *rhs);
 typedef struct {
   cemu_t cemu_key;
   cemu_t cemu_val;
-  treap_key_cmp_t key_cmp;
 } treap_arg_t;
 
 typedef struct treap_t {
   cemu_t _cemu_key;
   cemu_t _cemu_val;
   treap_node_t *_root;
-  treap_key_cmp_t _key_cmp;
 } treap_t;
 
 /**
@@ -51,10 +48,6 @@ typedef struct treap_t {
  * ==================== 
  */
 
-int cemu_treap_size();
-void *cemu_treap_new(void *arg);
-void cemu_treap_dtor(void *self);
-void cemu_treap_delete(void *self);
 cemu_t cemu_treap();
 
 /**
@@ -64,9 +57,9 @@ cemu_t cemu_treap();
  */
 
 treap_node_t *new_treap_node(void *key, void *val);
-void delete_treap_node(treap_t *, treap_node_t *);
-treap_t *new_treap(cemu_t cemu_key, cemu_t cemu_val, treap_key_cmp_t key_cmp);
-void delete_treap(treap_t *);
+void delete_treap_node(treap_t *self, treap_node_t *self_node);
+treap_t *new_treap(cemu_t cemu_key, cemu_t cemu_val);
+void delete_treap(treap_t *self);
 
 /**
  * ====================
@@ -74,11 +67,11 @@ void delete_treap(treap_t *);
  * ==================== 
  */
 
-int treap_size(treap_t *);
-void treap_clear(treap_t *);
-void treap_insert(treap_t *, treap_node_t **p, void *key, void *val);
-void treap_erase(treap_t *, treap_node_t **p, void *key);
-void *treap_find(treap_t *, treap_node_t **p, void *key);
-void treap_extract(treap_t *, treap_node_t **p, vector_t *keys, vector_t *vals);
+int treap_size(treap_t *self);
+void treap_clear(treap_t *self);
+void treap_insert(treap_t *self, treap_node_t **p, void *key, void *val);
+void treap_erase(treap_t *self, treap_node_t **p, void *key);
+void *treap_find(treap_t *self, treap_node_t **p, void *key);
+void treap_extract(treap_t *self, treap_node_t **p, vector_t *keys, vector_t *vals);
 
 #endif

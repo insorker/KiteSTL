@@ -12,16 +12,17 @@ const char *ERR_VECTOR_SIZE = "Error -> vector->size";
 
 void test_int();
 void test_vector_int();
-void test_str();
+void test_string();
 void test_struct();
 
-int main() {
+int main()
+{
   TEST_PRINT_FILE();
 
   TestFunction tf[] = {
     test_int,
     test_vector_int,
-    test_str,
+    test_string,
     test_struct,
     NULL
   };
@@ -31,7 +32,8 @@ int main() {
   }
 }
 
-void test_int() {
+void test_int()
+{
   TEST_PRINT_FUNC();
 
   vector_t *vec = new_vector(cemu(int, {}));
@@ -111,7 +113,8 @@ void test_vector_int()
   delete_vector(vec1);
 }
 
-void test_str() {
+void test_string()
+{
   TEST_PRINT_FUNC();
 
   vector_t *vec = new_vector(cemu_string());

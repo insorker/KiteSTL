@@ -31,10 +31,10 @@ static void cemu_string_delete(cemu_data_t data, void *self)
   free(self);
 }
 
-static void cemu_string_assign(cemu_data_t data, void *dest, const void *src)
+static void *cemu_string_assign(cemu_data_t data, void *dest, const void *src)
 {
   if (dest == NULL || src == NULL) {
-    return;
+    return dest;
   }
 
   string_t *str_dest = dest;
@@ -45,6 +45,8 @@ static void cemu_string_assign(cemu_data_t data, void *dest, const void *src)
 
   str_dest->_elems = malloc(str_dest->_capacity);
   memcpy(str_dest->_elems, str_src->_elems, str_src->_size);
+
+  return dest;
 }
 
 static void *cemu_string_copy(cemu_data_t data, const void *src)

@@ -23,26 +23,6 @@
  */
 
 typedef struct map_t {
-/** public **/
-  /* Return container size */
-  int (*size)(struct map_t *);
-
-  /* 	Clear content */
-  void (*clear)(struct map_t *);
-
-  /* Insert Elements */
-  void (*insert)(struct map_t *,  void *key, void *val);
-
-  /* Erase Elements */
-  void (*erase)(struct map_t *, void *key);
-
-  /* Get Element */
-  void *(*find)(struct map_t *, void *key);
-
-  /* Extract All */
-  void (*extract)(struct map_t *, vector_t *keys, vector_t *vals);
-
-/** private **/
   treap_t *_tr;
 } map_t;
 
@@ -52,9 +32,6 @@ typedef struct map_t {
  * ==================== 
  */
 
-int cemu_map_size();
-void *cemu_map_new(void *arg);
-void cemu_map_delete(void *self);
 cemu_t cemu_map();
 
 /**
@@ -63,8 +40,8 @@ cemu_t cemu_map();
  * ==================== 
  */
 
-map_t *new_map(cemu_t cemu_key, cemu_t cemu_val, treap_key_cmp_t key_cmp);
-void delete_map(map_t *);
+map_t *new_map(cemu_t cemu_key, cemu_t cemu_val);
+void delete_map(map_t *self);
 
 /**
  * ====================
@@ -72,11 +49,11 @@ void delete_map(map_t *);
  * ==================== 
  */
 
-int map_size(map_t *);
-void map_clear(map_t *);
-void map_insert(map_t *,  void *key, void *val);
-void map_erase(map_t *,  void *key);
-void *map_find(map_t *,  void *key);
-void map_extract(map_t *, vector_t *keys, vector_t *vals);
+int map_size(map_t *self);
+void map_clear(map_t *self);
+void map_insert(map_t *self,  void *key, void *val);
+void map_erase(map_t *self,  void *key);
+void *map_find(map_t *self,  void *key);
+void map_extract(map_t *self, vector_t *keys, vector_t *vals);
 
 #endif

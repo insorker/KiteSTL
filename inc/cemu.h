@@ -12,7 +12,7 @@ typedef struct {
   void *(*new)   (cemu_data_t data);
   void  (*dtor)  (cemu_data_t data, void *self);
   void  (*delete)(cemu_data_t data, void *self);
-  void  (*assign)(cemu_data_t data, void *dest, const void *src);
+  void *(*assign)(cemu_data_t data, void *dest, const void *src);
   void *(*copy)  (cemu_data_t data, const void *src);
   int   (*cmp)   (cemu_data_t data, const void *lhs, const void *rhs);
 } cemu_impl_t;

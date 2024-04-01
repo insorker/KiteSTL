@@ -17,6 +17,7 @@ void _string(string_t self);
 string_t *new_string(const char *s);
 void delete_string(string_t *self);
 
+string_t *string_replace(string_t *self, const char *s);
 int   string_size(string_t *self);
 bool  string_empty(string_t *self);
 void  string_resize(string_t *self, int n, const char c);

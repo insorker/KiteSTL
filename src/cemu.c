@@ -26,13 +26,14 @@ static void cemu_delete(cemu_data_t data, void *self)
   free(self);
 }
 
-static void cemu_assign(cemu_data_t data, void *dest, const void *src)
+static void *cemu_assign(cemu_data_t data, void *dest, const void *src)
 {
   if (dest == NULL || src == NULL) {
-    return;
+    return dest;
   }
 
   memcpy(dest, src, data._size);
+  return dest;
 }
 
 static void *cemu_copy(cemu_data_t data, const void* src)

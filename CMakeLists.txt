@@ -19,8 +19,8 @@ include_directories(${CMAKE_SOURCE_DIR}/inc)
 
 add_library(cemu STATIC src/cemu.c)
 add_library(str STATIC src/str.c)
-# add_library(map src/map.c)
-# add_library(treap src/treap.c)
+add_library(map src/map.c)
+add_library(treap src/treap.c)
 add_library(vector STATIC src/vector.c)
 
 ####################
@@ -46,6 +46,6 @@ add_executable(test_vector test/test_vector.c)
 target_link_libraries(test_vector PRIVATE vector str cemu)
 add_test(NAME test_vector COMMAND test_vector)
 
-# add_executable(test_map test/test_map.c)
-# target_link_libraries(test_map PRIVATE map treap vector str cemu)
-# add_test(NAME test_map COMMAND test_map)
+add_executable(test_map test/test_map.c)
+target_link_libraries(test_map PRIVATE map treap vector str cemu)
+add_test(NAME test_map COMMAND test_map)

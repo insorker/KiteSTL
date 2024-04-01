@@ -7,39 +7,17 @@
  * ==================== 
  */
 
-cemu_t cemu_map()
+static cemu_data_t cemu_map_data = { sizeof(cemu_data_t) };
+
+static void cemu_map_dtor(cemu_data_t data, void *self)
 {
-  return (cemu_t){
-    cemu_map_size, cemu_map_new, NULL, NULL, cemu_map_delete
-  };
+  delete_treap(((map_t *)self)->_tr);
 }
 
-int cemu_map_size()
+static void cemu_map_delete(cemu_data_t data, void *self)
 {
-  return sizeof(map_t);
-}
-
-void *cemu_map_new(void *arg)
-{
-  map_t *map = (map_t *)malloc(sizeof(map_t));
-
-  map->size = map_size;
-  map->clear = map_clear;
-  map->insert = map_insert;
-  map->erase = map_erase;
-  map->find = map_find;
-  map->extract = map_extract;
-
-  map->_tr = cemu_treap_new(arg);
-
-  return map;
-}
-
-void cemu_map_delete(void *self)
-{
-  map_t *map = self;
-  delete_treap(map->_tr);
-  free(map);
+  cemu_map_dtor(data, self);
+  free(self);
 }
 
 /**
@@ -48,14 +26,18 @@ void cemu_map_delete(void *self)
  * ==================== 
  */
 
-map_t *new_map(cemu_t cemu_key, cemu_t cemu_val, treap_key_cmp_t key_cmp)
+map_t *new_map(cemu_t cemu_key, cemu_t cemu_val)
 {
-  return cemu_map_new(&(treap_arg_t){cemu_key, cemu_val, key_cmp});
+  map_t *map = (map_t *)malloc(sizeof(map_t));
+  
+  map->_tr = new_treap(cemu_key, cemu_val);
+
+  return map;
 }
 
 void delete_map(map_t *map)
 {
-  cemu_map_delete(map);
+  cemu_map_delete(cemu_map_data, map);
 }
 
 /**
@@ -64,32 +46,32 @@ void delete_map(map_t *map)
  * ==================== 
  */
 
-int map_size(map_t *map)
+int map_size(map_t *self)
 {
-  return map->_tr->size(map->_tr);
+  return treap_size(self->_tr);
 }
 
-void map_clear(map_t *map)
+void map_clear(map_t *self)
 {
-  map->_tr->clear(map->_tr);
+  treap_clear(self->_tr);
 }
 
-void map_insert(map_t *map, void *key, void *val)
+void map_insert(map_t *self, void *key, void *val)
 {
-  map->_tr->insert(map->_tr, &map->_tr->_root, key, val);
+  treap_insert(self->_tr, &self->_tr->_root, key, val);
 }
 
-void map_erase(map_t *map, void *key)
+void map_erase(map_t *self, void *key)
 {
-  map->_tr->erase(map->_tr, &map->_tr->_root, key);
+  treap_erase(self->_tr, &self->_tr->_root, key);
 }
 
-void *map_find(map_t *map, void *key)
+void *map_find(map_t *self, void *key)
 {
-  return map->_tr->find(map->_tr, &map->_tr->_root, key);
+  return treap_find(self->_tr, &self->_tr->_root, key);
 }
 
-void map_extract(map_t *map, vector_t *keys, vector_t *vals)
+void map_extract(map_t *self, vector_t *keys, vector_t *vals)
 {
-  map->_tr->extract(map->_tr, &map->_tr->_root, keys, vals);
+  treap_extract(self->_tr, &self->_tr->_root, keys, vals);
 }
