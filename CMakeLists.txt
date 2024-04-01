@@ -18,7 +18,7 @@ include_directories(${CMAKE_SOURCE_DIR}/inc/cemu)
 # source
 ####################
 
-add_library(cemu src/cemu/cemu.c)
+add_library(cemu src/cemu.c)
 # add_library(cemu_str src/cemu/cemu_str.c)
 # add_library(map src/map.c)
 # add_library(treap src/treap.c)

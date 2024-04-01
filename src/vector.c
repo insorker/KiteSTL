@@ -6,8 +6,8 @@
 
 #define VECTOR_DEFAULT_CAPACITY 3
 
-static void vector_expand(vector_t *);
-static void vector_shrink(vector_t *);
+static void vector_expand(vector_t *self);
+static void vector_shrink(vector_t *self);
 
 /**
  * ====================
@@ -15,7 +15,7 @@ static void vector_shrink(vector_t *);
  * ==================== 
  */
 
-static cemu_data_t cemu_vector_data = { sizeof(vector_t) };
+static const cemu_data_t cemu_vector_data = { sizeof(vector_t) };
 
 static void cemu_vector_dtor(cemu_data_t data, void *self)
 {
@@ -26,10 +26,10 @@ static void cemu_vector_dtor(cemu_data_t data, void *self)
   vector_t *vec = self;
 
   for (int i = 0; i < vec->_size; i++) {
-    void *elem = vec->_elem + vec->_tsize * i;
+    void *elem = vec->_elems + vec->_elem_size * i;
     cemu_impl(vec->_cemu_elem, dtor, elem);
   }
-  free(vec->_elem);
+  free(vec->_elems);
 }
 
 static void cemu_vector_delete(cemu_data_t data, void *self)
@@ -43,44 +43,44 @@ static void cemu_vector_delete(cemu_data_t data, void *self)
 }
 
 
-static void cemu_vector_assign(cemu_data_t data, void *dest, void *src)
+static void cemu_vector_assign(cemu_data_t data, void *dest, const void *src)
 {
   if (dest == NULL || src == NULL) {
     return;
   }
 
   vector_t *vec_dest = dest;
-  vector_t *vec_src = src;
-  int elem_size = vec_src->_tsize;
+  const vector_t *vec_src = src;
+  int elem_size = vec_src->_elem_size;
 
   cemu_vector_dtor(data, dest);
   memcpy(vec_dest, vec_src, sizeof(vector_t));
 
-  vec_dest->_elem = malloc(vec_dest->_capacity * elem_size);
+  vec_dest->_elems = malloc(vec_dest->_capacity * elem_size);
   for (int i = 0; i < vec_dest->_size; i++) {
-    void *elem_dest = vec_dest->_elem + elem_size * i;
-    void *elem_src = vec_src->_elem + elem_size * i;
+    void *elem_dest = vec_dest->_elems + elem_size * i;
+    void *elem_src = vec_src->_elems + elem_size * i;
 
     memcpy(elem_dest, elem_src, elem_size);
   }
 }
 
-static void *cemu_vector_copy(cemu_data_t data, void *src)
+static void *cemu_vector_copy(cemu_data_t data, const void *src)
 {
   if (src == NULL) {
     return NULL;
   }
 
   vector_t *vec_dest = malloc(sizeof(vector_t));
-  vector_t *vec_src = src;
-  int elem_size = vec_src->_tsize;
+  const vector_t *vec_src = src;
+  int elem_size = vec_src->_elem_size;
 
   memcpy(vec_dest, vec_src, sizeof(vector_t));
 
-  vec_dest->_elem = malloc(vec_dest->_capacity * elem_size);
+  vec_dest->_elems = malloc(vec_dest->_capacity * elem_size);
   for (int i = 0; i < vec_dest->_size; i++) {
-    void *elem_dest = vec_dest->_elem + elem_size * i;
-    void *elem_src = vec_src->_elem + elem_size * i;
+    void *elem_dest = vec_dest->_elems + elem_size * i;
+    void *elem_src = vec_src->_elems + elem_size * i;
 
     memcpy(elem_dest, elem_src, elem_size);
   }
@@ -88,10 +88,10 @@ static void *cemu_vector_copy(cemu_data_t data, void *src)
   return vec_dest;
 }
 
-static int cemu_vector_cmp(cemu_data_t data, void *lhs, void *rhs)
+static int cemu_vector_cmp(cemu_data_t data, const void *lhs, const void *rhs)
 {
-  vector_t *vec_lhs = lhs;
-  vector_t *vec_rhs = rhs;
+  const vector_t *vec_lhs = lhs;
+  const vector_t *vec_rhs = rhs;
   cemu_t cemu_elem = vec_lhs->_cemu_elem;
 
   if (vec_lhs->_size != vec_rhs->_size) {
@@ -99,10 +99,10 @@ static int cemu_vector_cmp(cemu_data_t data, void *lhs, void *rhs)
   }
   
   int size = vec_lhs->_size;
-  int elem_size = vec_lhs->_tsize;
+  int elem_size = vec_lhs->_elem_size;
   for (int i = 0; i < size * elem_size; i += elem_size) {
-    void *elem_lhs = vec_lhs->_elem + i;
-    void *elem_rhs = vec_lhs->_elem + i;
+    void *elem_lhs = vec_lhs->_elems + i;
+    void *elem_rhs = vec_lhs->_elems + i;
     int result = cemu_impl(cemu_elem, cmp, elem_lhs, elem_rhs);
 
     if (result != 0) {
@@ -139,10 +139,10 @@ vector_t *new_vector(cemu_t cemu_elem)
   vector_t *vec = malloc(sizeof(vector_t));
 
   vec->_size = 0;
-  vec->_tsize = cemu_impl(cemu_elem, size);
+  vec->_elem_size = cemu_impl(cemu_elem, size);
   vec->_capacity = VECTOR_DEFAULT_CAPACITY;
   vec->_cemu_elem = cemu_elem;
-  vec->_elem = malloc(vec->_capacity * cemu_impl(cemu_elem, size));
+  vec->_elems = malloc(vec->_capacity * cemu_impl(cemu_elem, size));
 
   return vec;
 }
@@ -174,10 +174,10 @@ void *vector_at(vector_t *self, int n)
     return NULL;
   }
 
-  return self->_elem + self->_tsize * n;
+  return self->_elems + self->_elem_size * n;
 }
 
-void vector_insert(vector_t *self, int n, void *value)
+void vector_insert(vector_t *self, int n, const void *value)
 {
   if (n < 0 || n > self->_size) {
     return;
@@ -185,14 +185,14 @@ void vector_insert(vector_t *self, int n, void *value)
 
   vector_expand(self);
   for (int i = self->_size; i > n; i--) {
-    void *elem_next = self->_elem + self->_tsize * i;
-    void *elem_prev = self->_elem + self->_tsize * (i - 1);
+    void *elem_next = self->_elems + self->_elem_size * i;
+    void *elem_prev = self->_elems + self->_elem_size * (i - 1);
 
-    memcpy(elem_next, elem_prev, self->_tsize);
+    memcpy(elem_next, elem_prev, self->_elem_size);
   }
-  void *dest = self->_elem + self->_tsize * n;
+  void *dest = self->_elems + self->_elem_size * n;
   void *src = cemu_impl(self->_cemu_elem, copy, value);
-  memcpy(dest, src, self->_tsize);
+  memcpy(dest, src, self->_elem_size);
   free(src);
 
   self->_size += 1;
@@ -204,19 +204,19 @@ void vector_erase(vector_t *self, int n)
     return;
   }
 
-  cemu_impl(self->_cemu_elem, dtor, self->_elem + self->_tsize * n);
+  cemu_impl(self->_cemu_elem, dtor, self->_elems + self->_elem_size * n);
   for (int i = n + 1; i < self->_size; i++) {
-    void *elem_next = self->_elem + self->_tsize * i;
-    void *elem_prev = self->_elem + self->_tsize * (i - 1);
+    void *elem_next = self->_elems + self->_elem_size * i;
+    void *elem_prev = self->_elems + self->_elem_size * (i - 1);
 
-    memcpy(elem_prev, elem_next, self->_tsize);
+    memcpy(elem_prev, elem_next, self->_elem_size);
   }
 
   self->_size -= 1;
   vector_shrink(self);
 }
 
-void vector_push_back(vector_t *self, void *value)
+void vector_push_back(vector_t *self, const void *value)
 {
   vector_insert(self, self->_size, value);
 }
@@ -239,7 +239,7 @@ static void vector_expand(vector_t *self)
   if (self->_capacity * 2 < 0) return;
 
   self->_capacity *= 2;
-  self->_elem = realloc(self->_elem, self->_capacity * self->_tsize);
+  self->_elems = realloc(self->_elems, self->_capacity * self->_elem_size);
 }
 
 static void vector_shrink(vector_t *self)
@@ -248,5 +248,5 @@ static void vector_shrink(vector_t *self)
   if (self->_capacity <= self->_size * 2) return;
 
   self->_capacity /= 2;
-  self->_elem = realloc(self->_elem, self->_capacity * self->_tsize);
+  self->_elems = realloc(self->_elems, self->_capacity * self->_elem_size);
 }

@@ -26,11 +26,11 @@
 
 typedef struct {
   int _size;
-  int _tsize;
   int _capacity;
 
+  void *_elems;
+  int _elem_size;
   cemu_t _cemu_elem;
-  void *_elem;
 } vector_t;
 
 /**
@@ -47,8 +47,8 @@ cemu_t cemu_vector();
  * ==================== 
  */
 
-vector_t *new_vector(cemu_t elem_cemu);
-void delete_vector(vector_t *);
+vector_t *new_vector(cemu_t cemu_elem);
+void delete_vector(vector_t *self);
 
 /**
  * ====================
@@ -56,13 +56,13 @@ void delete_vector(vector_t *);
  * ==================== 
  */
 
-int   vector_size(vector_t *);
-bool  vector_empty(vector_t *);
-void *vector_at(vector_t *, int n);
-void  vector_insert(vector_t *, int n, void *val);
-void  vector_erase(vector_t *, int n);
-void  vector_push_back(vector_t *, void *val);
-void  vector_pop_back(vector_t *);
-void  vector_clear(vector_t *);
+int   vector_size(vector_t *self);
+bool  vector_empty(vector_t *self);
+void *vector_at(vector_t *self, int n);
+void  vector_insert(vector_t *self, int n, const void *val);
+void  vector_erase(vector_t *self, int n);
+void  vector_push_back(vector_t *self, const void *val);
+void  vector_pop_back(vector_t *self);
+void  vector_clear(vector_t *self);
 
 #endif
