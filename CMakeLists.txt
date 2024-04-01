@@ -12,17 +12,16 @@ add_link_options("$<$<CONFIG:DEBUG>:-fsanitize=address>")
 # include
 ####################
 include_directories(${CMAKE_SOURCE_DIR}/inc)
-include_directories(${CMAKE_SOURCE_DIR}/inc/cemu)
 
 ####################
 # source
 ####################
 
-add_library(cemu src/cemu.c)
-# add_library(cemu_str src/cemu/cemu_str.c)
+add_library(cemu STATIC src/cemu.c)
+add_library(str STATIC src/str.c)
 # add_library(map src/map.c)
 # add_library(treap src/treap.c)
-add_library(vector src/vector.c)
+add_library(vector STATIC src/vector.c)
 
 ####################
 # lib
@@ -32,18 +31,21 @@ add_library(vector src/vector.c)
 # set(LIB_SRC ${CEMU_SRC} ${STL_SRC})
 
 # ADD_LIBRARY(KiteSTL SHARED ${LIB_SRC})
-add_library(KiteSTL src/vector.c)
+add_library(KiteSTL SHARED src/vector.c)
 
 ####################
 # test
 ####################
 enable_testing()
 
-add_executable(vector_test test/vector_test.c)
-# target_link_libraries(vector_test PRIVATE vector cemu_str cemu)
-target_link_libraries(vector_test PRIVATE vector cemu)
-add_test(NAME vector_test COMMAND vector_test)
+add_executable(test_str test/test_str.c)
+target_link_libraries(test_str PRIVATE str cemu)
+add_test(NAME test_str COMMAND test_str)
 
-# add_executable(map_test test/map_test.c)
-# target_link_libraries(map_test PRIVATE map treap vector cemu_str cemu)
-# add_test(NAME map_test COMMAND map_test)
+add_executable(test_vector test/test_vector.c)
+target_link_libraries(test_vector PRIVATE vector str cemu)
+add_test(NAME test_vector COMMAND test_vector)
+
+# add_executable(test_map test/test_map.c)
+# target_link_libraries(test_map PRIVATE map treap vector str cemu)
+# add_test(NAME test_map COMMAND test_map)

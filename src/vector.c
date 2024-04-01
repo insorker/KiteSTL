@@ -2,9 +2,10 @@
 #include <malloc.h>
 #include <string.h>
 #include <limits.h>
-#include <assert.h>
 
-#define VECTOR_DEFAULT_CAPACITY 3
+#define VECTOR_SCALING_FACTOR 2
+#define VECTOR_MIN_CAPACITY 3
+#define VECTOR_MAX_CAPACITY INT_MAX
 
 static void vector_expand(vector_t *self);
 static void vector_shrink(vector_t *self);
@@ -41,7 +42,6 @@ static void cemu_vector_delete(cemu_data_t data, void *self)
   cemu_vector_dtor(data, self);
   free(self);
 }
-
 
 static void cemu_vector_assign(cemu_data_t data, void *dest, const void *src)
 {
@@ -94,11 +94,9 @@ static int cemu_vector_cmp(cemu_data_t data, const void *lhs, const void *rhs)
   const vector_t *vec_rhs = rhs;
   cemu_t cemu_elem = vec_lhs->_cemu_elem;
 
-  if (vec_lhs->_size != vec_rhs->_size) {
-    return vec_lhs->_size > vec_rhs->_size;
-  }
-  
-  int size = vec_lhs->_size;
+  int size =
+    vec_lhs->_size <= vec_rhs->_size ?
+    vec_lhs->_size : vec_rhs->_size;
   int elem_size = vec_lhs->_elem_size;
   for (int i = 0; i < size * elem_size; i += elem_size) {
     void *elem_lhs = vec_lhs->_elems + i;
@@ -110,6 +108,12 @@ static int cemu_vector_cmp(cemu_data_t data, const void *lhs, const void *rhs)
     }
   }
 
+  if (vec_lhs->_size > vec_rhs->_size) {
+    return 1;
+  }
+  else if (vec_lhs->_size < vec_rhs->_size) {
+    return -1;
+  }
   return 0;
 }
 
@@ -130,9 +134,27 @@ cemu_t cemu_vector()
 
 /**
  * ====================
- * new / delete
+ * construct
  * ==================== 
  */
+
+vector_t vector(cemu_t cemu_elem)
+{
+  vector_t vec;
+
+  vec._size = 0;
+  vec._elem_size = cemu_impl(cemu_elem, size);
+  vec._capacity = VECTOR_MIN_CAPACITY;
+  vec._cemu_elem = cemu_elem;
+  vec._elems = malloc(vec._capacity * cemu_impl(cemu_elem, size));
+
+  return vec;
+}
+
+void _vector(vector_t self)
+{
+  cemu_vector_dtor(cemu_vector_data, &self);
+}
 
 vector_t *new_vector(cemu_t cemu_elem)
 {
@@ -140,7 +162,7 @@ vector_t *new_vector(cemu_t cemu_elem)
 
   vec->_size = 0;
   vec->_elem_size = cemu_impl(cemu_elem, size);
-  vec->_capacity = VECTOR_DEFAULT_CAPACITY;
+  vec->_capacity = VECTOR_MIN_CAPACITY;
   vec->_cemu_elem = cemu_elem;
   vec->_elems = malloc(vec->_capacity * cemu_impl(cemu_elem, size));
 
@@ -166,6 +188,25 @@ int vector_size(vector_t *self)
 bool vector_empty(vector_t *self)
 {
   return self->_size == 0;
+}
+
+void vector_resize(vector_t *self, int n, const void *value)
+{
+  if (n < 0) {
+    return;
+  }
+  else if (n < self->_size) {
+    for (int i = self->_size - 1; i >= n; i--) {
+      void *elem = self->_elems + self->_elem_size * i;
+      cemu_impl(self->_cemu_elem, dtor, elem);
+    }
+    vector_shrink(self);
+  }
+  else if (n < INT_MAX && value) {
+    while (n > self->_size) {
+      vector_push_back(self, value);
+    }
+  }
 }
 
 void *vector_at(vector_t *self, int n)
@@ -236,17 +277,17 @@ void vector_clear(vector_t *self)
 static void vector_expand(vector_t *self)
 {
   if (self->_size < self->_capacity) return;
-  if (self->_capacity * 2 < 0) return;
+  if (self->_capacity * VECTOR_SCALING_FACTOR < 0) return;
 
-  self->_capacity *= 2;
+  self->_capacity *= VECTOR_SCALING_FACTOR;
   self->_elems = realloc(self->_elems, self->_capacity * self->_elem_size);
 }
 
 static void vector_shrink(vector_t *self)
 {
-  if (self->_capacity == VECTOR_DEFAULT_CAPACITY) return;
-  if (self->_capacity <= self->_size * 2) return;
+  if (self->_capacity == VECTOR_MIN_CAPACITY) return;
+  if (self->_capacity <= self->_size * VECTOR_SCALING_FACTOR) return;
 
-  self->_capacity /= 2;
+  self->_capacity /= VECTOR_SCALING_FACTOR;
   self->_elems = realloc(self->_elems, self->_capacity * self->_elem_size);
 }

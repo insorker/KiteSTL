@@ -25,7 +25,6 @@
  */
 
 typedef struct treap_node_t {
-/** public **/
   struct treap_node_t *_le, *_ri;
   void *_key, *_val;
   int _rand;
@@ -40,44 +39,10 @@ typedef struct {
 } treap_arg_t;
 
 typedef struct treap_t {
-/** public **/
-  /* Return container size */
-  int (*size)(struct treap_t *);
-
-  /* 	Clear content */
-  void (*clear)(struct treap_t *);
-
-  /* Insert Elements */
-  void (*insert)(struct treap_t *, treap_node_t **p, void *key, void *val);
-
-  /* Erase Elements */
-  void (*erase)(struct treap_t *, treap_node_t **p, void *key);
-
-  /* Get Element */
-  void *(*find)(struct treap_t *, treap_node_t **p, void *key);
-
-  /* Extract All */
-  void (*extract)(struct treap_t *, treap_node_t **p, vector_t *keys, vector_t *vals);
-
-/** protected **/
-  /* key cmp */
-  int (*key_cmp)(struct treap_t *self, void *lhs, void *rhs);
-
-  /* push up */
-  void (*pushup)(struct treap_t *, treap_node_t **p);
-
-  /* rotate left */
-  void (*zig)(struct treap_t *, treap_node_t **p);
-
-  /* rotate right */
-  void (*zag)(struct treap_t *, treap_node_t **p);
-
-/** private **/
   cemu_t _cemu_key;
   cemu_t _cemu_val;
   treap_node_t *_root;
   treap_key_cmp_t _key_cmp;
-
 } treap_t;
 
 /**

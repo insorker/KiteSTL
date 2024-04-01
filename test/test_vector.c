@@ -1,6 +1,6 @@
 #include "test.h"
 #include "vector.h"
-// #include "cemu_str.h"
+#include "str.h"
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
@@ -21,8 +21,8 @@ int main() {
   TestFunction tf[] = {
     test_int,
     test_vector_int,
-    // test_str,
-    // test_struct,
+    test_str,
+    test_struct,
     NULL
   };
 
@@ -111,85 +111,55 @@ void test_vector_int()
   delete_vector(vec1);
 }
 
-// void test_str() {
-//   TEST_PRINT_FUNC();
+void test_str() {
+  TEST_PRINT_FUNC();
 
-//   vector_t *vec = new_vector(cemu_str());
+  vector_t *vec = new_vector(cemu_string());
 
-//   vector_push_back(vec, cemu_make(char *, "Hello"));
-//   TEST_ASSERT(strcmp(cemu_get(char *, vector_at(vec, 0)), "Hello") == 0, ERR_VECTOR_INSERT);
-//   vector_push_back(vec, &(char *){"World"});
-//   TEST_ASSERT(strcmp(*(char **)vector_at(vec, 1), "World") == 0, ERR_VECTOR_INSERT);
+  {
+    string_t str = string("Hello");
+    vector_push_back(vec, &str);
+    _string(str);
+  }
+  TEST_ASSERT(strcmp(string_at(vector_at(vec, 0), 0), "Hello") == 0, ERR_VECTOR_INSERT);
+  {
+    string_t str = string("World");
+    vector_push_back(vec, &str);
+    _string(str);
+  }
+  TEST_ASSERT(strcmp(string_at(vector_at(vec, 1), 0), "World") == 0, ERR_VECTOR_INSERT);
 
-//   delete_vector(vec);
-// }
+  delete_vector(vec);
+}
 
-// typedef struct {
-//   char name[10];
-//   int age;
-// } people_t;
+typedef struct {
+  char name[10];
+  int age;
+} people_t;
 
-// int cemu_people_size()
-// {
-//   return sizeof(people_t);
-// }
+void test_struct() {
+  TEST_PRINT_FUNC();
 
-// void *cemu_people_copy(void *other)
-// {
-//   people_t *p_other = other;
-//   people_t *p = malloc(sizeof(people_t));
+  vector_t *vec = new_vector(cemu(people_t, {}));
+  people_t people[] = {
+    { "John", 1 },
+    { "Mary", 5 },
+    { "Max", 10 },
+    { "Ben", 43 },
+    { "Tom", 18 }
+  };
 
-//   for (int i = 0; i < 10; i++) {
-//     p->name[i] = p_other->name[i];
-//   }
-//   p->age = p_other->age;
+  vector_push_back(vec, &people[0]);
+  vector_push_back(vec, &people[1]);
+  vector_push_back(vec, &(people_t){ "Max", 10 });
+  vector_push_back(vec, &(people_t){ "Ben", 43 });
+  vector_push_back(vec, &(people_t){ "Tom", 18 });
 
-//   return p;
-// }
+  for (int i = 0; i < vector_size(vec); i++) {
+    people_t p = *(people_t *)vector_at(vec, i);
+    TEST_ASSERT(strcmp(p.name, people[i].name) == 0, ERR_VECTOR_INSERT);
+    TEST_ASSERT(p.age == people[i].age, ERR_VECTOR_INSERT);
+  }
 
-// void cemu_people_dtor(void *self)
-// {
-  
-// }
-
-// void cemu_people_op_assign(void *dest, void *src)
-// {
-//   void *copy = cemu_people_copy(src);
-//   memcpy(dest, copy, cemu_people_size());
-//   free(copy);
-// }
-
-// cemu_t cemu_people()
-// {
-//   return (cemu_t){
-//     cemu_people_size,
-//     NULL, cemu_people_copy, cemu_people_dtor, NULL, cemu_people_op_assign
-//   };
-// }
-
-// void test_struct() {
-//   TEST_PRINT_FUNC();
-
-//   vector_t *vec = new_vector(cemu_people());
-//   people_t people[] = {
-//     { "John", 1 },
-//     { "Mary", 5 },
-//     { "Max", 10 },
-//     { "Ben", 43 },
-//     { "Tom", 18 }
-//   };
-
-//   vector_push_back(vec, &people[0]);
-//   vector_push_back(vec, &people[1]);
-//   vector_push_back(vec, &(people_t){ "Max", 10 });
-//   vector_push_back(vec, &(people_t){ "Ben", 43 });
-//   vector_push_back(vec, &(people_t){ "Tom", 18 });
-
-//   for (int i = 0; i < vector_size(vec); i++) {
-//     people_t p = *(people_t *)vector_at(vec, i);
-//     TEST_ASSERT(strcmp(p.name, people[i].name) == 0, ERR_VECTOR_INSERT);
-//     TEST_ASSERT(p.age == people[i].age, ERR_VECTOR_INSERT);
-//   }
-
-//   delete_vector(vec);
-// }
+  delete_vector(vec);
+}
