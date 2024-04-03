@@ -56,7 +56,7 @@ static int cemu_cmp(cemu_data_t data, const void *lhs, const void *rhs)
   return memcmp(lhs, rhs, data._size);
 }
 
-cemu_t cemu_init(cemu_data_t data, cemu_impl_t impl, cemu_iter_t iter)
+cemu_t _cemu(cemu_data_t data, cemu_impl_t impl, cemu_iter_t iter)
 {
   return (cemu_t){
     .data = data,

@@ -12,11 +12,12 @@ typedef struct {
 
 cemu_t cemu_string();
 
-string_t string(const char *s);
+string_t string();
 void _string(string_t self);
-string_t *new_string(const char *s);
+string_t *new_string();
 void delete_string(string_t *self);
 
+string_t *string_from(const char *s);
 string_t *string_replace(string_t *self, const char *s);
 int   string_size(string_t *self);
 bool  string_empty(string_t *self);

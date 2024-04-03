@@ -10,7 +10,7 @@ static void treap_zag(treap_t *, treap_node_t **p);
 
 /**
  * ====================
- * cemu
+ * proto_cemu
  * ==================== 
  */
 
@@ -35,8 +35,7 @@ cemu_t cemu_treap()
     cemu_treap_dtor,
     cemu_treap_delete
   };
-
-  return cemu(treap_t, impl);
+  return proto_cemu(cemu_treap_data, impl, {});
 }
 
 
@@ -108,14 +107,12 @@ void treap_clear(treap_t *self)
 void treap_insert(treap_t *self, treap_node_t **p, void *key, void *val)
 {
   if (!(*p)) {
-    *p = new_treap_node(
-      cemu_impl(self->_cemu_key, copy, key),
-      cemu_impl(self->_cemu_val, copy, val)
-    );
+    *p = new_treap_node(key, val);
   }
   else if (cemu_impl(self->_cemu_key, cmp, (*p)->_key, key) == 0) {
     cemu_impl(self->_cemu_val, delete, (*p)->_val);
-    (*p)->_val = cemu_impl(self->_cemu_val, copy, val);
+    cemu_impl(self->_cemu_key, delete, key);
+    (*p)->_val = val;
   }
   else if (cemu_impl(self->_cemu_key, cmp, (*p)->_key, key) > 0) {
     treap_insert(self, &(*p)->_le, key, val);
@@ -136,6 +133,7 @@ void treap_insert(treap_t *self, treap_node_t **p, void *key, void *val)
 void treap_erase(treap_t *self, treap_node_t **p, void *key)
 {
   if (!(*p)) {
+    cemu_impl(self->_cemu_key, delete, key);
     return;
   }
   else if (cemu_impl(self->_cemu_key, cmp, (*p)->_key, key) == 0) {
@@ -160,6 +158,7 @@ void treap_erase(treap_t *self, treap_node_t **p, void *key)
     else {
       delete_treap_node(self, *p);
       *p = NULL;
+      cemu_impl(self->_cemu_key, delete, key);
     }
   }
   else if (cemu_impl(self->_cemu_key, cmp, (*p)->_key, key) > 0) {
@@ -175,9 +174,11 @@ void treap_erase(treap_t *self, treap_node_t **p, void *key)
 void *treap_find(treap_t *self, treap_node_t **p, void *key)
 {
   if (!(*p)) {
+    cemu_impl(self->_cemu_key, delete, key);
     return NULL;
   }
   else if (cemu_impl(self->_cemu_key, cmp, (*p)->_key, key) == 0) {
+    cemu_impl(self->_cemu_key, delete, key);
     return (*p)->_val;
   }
   else if (cemu_impl(self->_cemu_key, cmp, (*p)->_key, key) > 0) {
@@ -193,8 +194,8 @@ void treap_extract(treap_t *self, treap_node_t **p, vector_t *keys, vector_t *va
   if (!(*p)) return;
 
   if ((*p)->_le) treap_extract(self, &(*p)->_le, keys, vals);
-  vector_push_back(keys, (*p)->_key);
-  vector_push_back(vals, (*p)->_val);
+  vector_push_back(keys, cemu_impl(self->_cemu_key, copy, (*p)->_key));
+  vector_push_back(vals, cemu_impl(self->_cemu_val, copy, (*p)->_val));
   if ((*p)->_ri) treap_extract(self, &(*p)->_ri, keys, vals);
 }
 

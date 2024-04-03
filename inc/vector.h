@@ -47,11 +47,11 @@ void delete_vector(vector_t *self);
 
 int   vector_size(vector_t *self);
 bool  vector_empty(vector_t *self);
-void  vector_resize(vector_t *self, int n, const void *val);
+void  vector_resize(vector_t *self, int n, void *val);
 void *vector_at(vector_t *self, int n);
-void  vector_insert(vector_t *self, int n, const void *val);
+void  vector_insert(vector_t *self, int n, void *val);
 void  vector_erase(vector_t *self, int n);
-void  vector_push_back(vector_t *self, const void *val);
+void  vector_push_back(vector_t *self, void *val);
 void  vector_pop_back(vector_t *self);
 void  vector_clear(vector_t *self);
 

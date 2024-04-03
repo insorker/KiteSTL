@@ -130,8 +130,7 @@ cemu_t cemu_vector()
     cemu_vector_copy,
     cemu_vector_cmp
   };
-
-  return cemu(vector_t, impl);
+  return proto_cemu(cemu_vector_data, impl, {});
 }
 
 /**
@@ -192,7 +191,7 @@ bool vector_empty(vector_t *self)
   return self->_size == 0;
 }
 
-void vector_resize(vector_t *self, int n, const void *value)
+void vector_resize(vector_t *self, int n, void *value)
 {
   if (n < 0) {
     return;
@@ -206,7 +205,8 @@ void vector_resize(vector_t *self, int n, const void *value)
   }
   else if (n < INT_MAX && value) {
     while (n > self->_size) {
-      vector_push_back(self, value);
+      vector_push_back(self, cemu_impl(self->_cemu_elem, copy, value));
+      cemu_impl(self->_cemu_elem, delete, value);
     }
   }
 }
@@ -220,7 +220,7 @@ void *vector_at(vector_t *self, int n)
   return self->_elems + self->_elem_size * n;
 }
 
-void vector_insert(vector_t *self, int n, const void *value)
+void vector_insert(vector_t *self, int n, void *value)
 {
   if (n < 0 || n > self->_size) {
     return;
@@ -234,9 +234,9 @@ void vector_insert(vector_t *self, int n, const void *value)
     memcpy(elem_next, elem_prev, self->_elem_size);
   }
   void *dest = self->_elems + self->_elem_size * n;
-  void *src = cemu_impl(self->_cemu_elem, copy, value);
-  memcpy(dest, src, self->_elem_size);
-  free(src);
+  // void *src = cemu_impl(self->_cemu_elem, copy, value);
+  memcpy(dest, value, self->_elem_size);
+  free(value);
 
   self->_size += 1;
 }
@@ -259,7 +259,7 @@ void vector_erase(vector_t *self, int n)
   vector_shrink(self);
 }
 
-void vector_push_back(vector_t *self, const void *value)
+void vector_push_back(vector_t *self, void *value)
 {
   vector_insert(self, self->_size, value);
 }

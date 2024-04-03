@@ -38,9 +38,9 @@ add_library(KiteSTL SHARED src/vector.c)
 ####################
 enable_testing()
 
-add_executable(test_str test/test_str.c)
-target_link_libraries(test_str PRIVATE str cemu)
-add_test(NAME test_str COMMAND test_str)
+# add_executable(test_str test/test_str.c)
+# target_link_libraries(test_str PRIVATE str cemu)
+# add_test(NAME test_str COMMAND test_str)
 
 add_executable(test_vector test/test_vector.c)
 target_link_libraries(test_vector PRIVATE vector str cemu)

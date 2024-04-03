@@ -27,13 +27,25 @@ typedef struct {
   cemu_iter_t iter;
 } cemu_t;
 
-cemu_t cemu_init(cemu_data_t data, cemu_impl_t impl, cemu_iter_t iter);
-#define cemu(T, impl) \
-  cemu_init((cemu_data_t){ sizeof(T) }, (cemu_impl_t)impl, (cemu_iter_t){})
+cemu_t _cemu(cemu_data_t data, cemu_impl_t impl, cemu_iter_t iter);
+#define proto_cemu(data, impl, iter) \
+  _cemu((cemu_data_t)data, (cemu_impl_t)impl, (cemu_iter_t)iter)
+
+#define cemu(T) \
+  proto_cemu({sizeof(T)}, {}, {})
+
 #define cemu_impl(cemu, fn, ...) \
   (cemu.impl.fn(cemu.data,##__VA_ARGS__))
-#define cemu_make(type, value) &(type){value}
+
+#define proto_cemu_from(T, cemu, ...) \
+  cemu_impl(cemu, copy, __VA_ARGS__)
+
+#define cemu_from(T, ...) \
+  proto_cemu_from(T, cemu(T), __VA_ARGS__)
+
+// #define cemu_make(type, value) &(type){value}
 #define cemu_get(type, value) *(type*)(value)
+
 
   /**
    * 1. Use `malloc` to creatd an instance and return a malloc pointer.

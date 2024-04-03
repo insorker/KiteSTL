@@ -36,10 +36,10 @@ void test_int()
 {
   TEST_PRINT_FUNC();
 
-  vector_t *vec = new_vector(cemu(int, {}));
+  vector_t *vec = new_vector(cemu(int));
 
   for (int i = 0; i < 10; i++) {
-    vector_push_back(vec, &i);
+    vector_push_back(vec, cemu_from(int, &i));
     TEST_ASSERT(*(int *)vector_at(vec, i) == i, ERR_VECTOR_FIND);
   }
 
@@ -69,37 +69,12 @@ void test_vector_int()
 
   vector_t *vec1 = new_vector(cemu_vector());
 
-  {
-    vector_t *vec2 = new_vector(cemu(int, {}));
-    vector_push_back(vec2, cemu_make(int, 1));
-    vector_push_back(vec2, cemu_make(int, 2));
-    vector_push_back(vec2, cemu_make(int, 3));
-
+  for (int i = 0; i < 3; i++) {
+    vector_t *vec2 = new_vector(cemu(int));
+    vector_push_back(vec2, cemu_from(int, &(int){1}));
+    vector_push_back(vec2, cemu_from(int, &(int){2}));
+    vector_push_back(vec2, cemu_from(int, &(int){3}));
     vector_push_back(vec1, vec2);
-
-    delete_vector(vec2);
-  }
-
-  {
-    vector_t *vec2 = new_vector(cemu(int, {}));
-    vector_push_back(vec2, cemu_make(int, 1));
-    vector_push_back(vec2, cemu_make(int, 2));
-    vector_push_back(vec2, cemu_make(int, 3));
-
-    vector_push_back(vec1, vec2);
-
-    delete_vector(vec2);
-  }
-
-  {
-    vector_t *vec2 = new_vector(cemu(int, {}));
-    vector_push_back(vec2, cemu_make(int, 1));
-    vector_push_back(vec2, cemu_make(int, 2));
-    vector_push_back(vec2, cemu_make(int, 3));
-
-    vector_push_back(vec1, vec2);
-
-    delete_vector(vec2);
   }
 
   for (int i = 0; i < 3; i++) {
@@ -119,17 +94,9 @@ void test_string()
 
   vector_t *vec = new_vector(cemu_string());
 
-  {
-    string_t str = string("Hello");
-    vector_push_back(vec, &str);
-    _string(str);
-  }
+  vector_push_back(vec, string_from("Hello"));
   TEST_ASSERT(strcmp(string_at(vector_at(vec, 0), 0), "Hello") == 0, ERR_VECTOR_INSERT);
-  {
-    string_t str = string("World");
-    vector_push_back(vec, &str);
-    _string(str);
-  }
+  vector_push_back(vec, string_from("World"));
   TEST_ASSERT(strcmp(string_at(vector_at(vec, 1), 0), "World") == 0, ERR_VECTOR_INSERT);
 
   delete_vector(vec);
@@ -143,7 +110,7 @@ typedef struct {
 void test_struct() {
   TEST_PRINT_FUNC();
 
-  vector_t *vec = new_vector(cemu(people_t, {}));
+  vector_t *vec = new_vector(cemu(people_t));
   people_t people[] = {
     { "John", 1 },
     { "Mary", 5 },
@@ -152,11 +119,11 @@ void test_struct() {
     { "Tom", 18 }
   };
 
-  vector_push_back(vec, &people[0]);
-  vector_push_back(vec, &people[1]);
-  vector_push_back(vec, &(people_t){ "Max", 10 });
-  vector_push_back(vec, &(people_t){ "Ben", 43 });
-  vector_push_back(vec, &(people_t){ "Tom", 18 });
+  vector_push_back(vec, cemu_from(people_t, &people[0]));
+  vector_push_back(vec, cemu_from(people_t, &people[1]));
+  vector_push_back(vec, cemu_from(people_t, &(people_t){ "Max", 10 }));
+  vector_push_back(vec, cemu_from(people_t, &(people_t){ "Ben", 43 }));
+  vector_push_back(vec, cemu_from(people_t, &(people_t){ "Tom", 18 }));
 
   for (int i = 0; i < vector_size(vec); i++) {
     people_t p = *(people_t *)vector_at(vec, i);

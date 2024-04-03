@@ -3,7 +3,7 @@
 
 /**
  * ====================
- * cemu
+ * proto_cemu
  * ==================== 
  */
 
@@ -18,6 +18,17 @@ static void cemu_map_delete(cemu_data_t data, void *self)
 {
   cemu_map_dtor(data, self);
   free(self);
+}
+
+cemu_t cemu_map()
+{
+  cemu_impl_t impl = {
+    NULL,
+    NULL,
+    cemu_map_dtor,
+    cemu_map_delete
+  };
+  return proto_cemu(cemu_map_data, impl, {});
 }
 
 /**

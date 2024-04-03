@@ -85,11 +85,10 @@ cemu_t cemu_string()
     cemu_string_copy,
     cemu_string_cmp
   };
-
-  return cemu(string_t, impl);
+  return proto_cemu(cemu_string_data, impl, {});
 }
 
-string_t string(const char *s)
+string_t string()
 {
   string_t str;
 
@@ -97,12 +96,6 @@ string_t string(const char *s)
   str._capacity = STRING_MIN_CAPACITY;
   str._elems = malloc(str._capacity);
   str._elems[0] = '\0';
-
-  if (s != NULL) {
-    for (int i = 0; s[i]; i++) {
-      string_push_back(&str, s[i]);
-    }
-  }
 
   return str;
 }
@@ -112,7 +105,7 @@ void _string(string_t self)
   cemu_string_dtor(cemu_string_data, &self);
 }
 
-string_t *new_string(const char *s)
+string_t *new_string()
 {
   string_t *str = malloc(sizeof(string_t));
 
@@ -120,12 +113,6 @@ string_t *new_string(const char *s)
   str->_capacity = STRING_MIN_CAPACITY;
   str->_elems = malloc(str->_capacity);
   str->_elems[0] = '\0';
-
-  if (s != NULL) {
-    for (int i = 0; s[i]; i++) {
-      string_push_back(str, s[i]);
-    }
-  }
 
   return str;
 }
@@ -140,6 +127,19 @@ void delete_string(string_t *self)
  * api
  * ==================== 
  */
+
+string_t *string_from(const char *s)
+{
+  string_t *self = new_string();
+
+  if (s != NULL) {
+    for (int i = 0; s[i]; i++) {
+      string_push_back(self, s[i]);
+    }
+  }
+
+  return self;
+}
 
 int string_size(string_t *self)
 {
