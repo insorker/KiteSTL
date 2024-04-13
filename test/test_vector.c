@@ -5,11 +5,6 @@
 #include <string.h>
 #include <malloc.h>
 
-const char *ERR_VECTOR_FIND = "Error -> vector->find";
-const char *ERR_VECTOR_INSERT = "Error -> vector->insert";
-const char *ERR_VECTOR_ERASE = "Error -> vector->erase";
-const char *ERR_VECTOR_SIZE = "Error -> vector->size";
-
 void test_int();
 void test_vector_int();
 void test_string();
@@ -19,17 +14,13 @@ int main()
 {
   TEST_PRINT_FILE();
 
-  TestFunction tf[] = {
+  test_overall((test_t[]){
     test_int,
     test_vector_int,
     test_string,
     test_struct,
     NULL
-  };
-
-  for (int i = 0; tf[i] != NULL; i++) {
-    tf[i](); printf("OK \n");
-  }
+  });
 }
 
 void test_int()
@@ -40,24 +31,24 @@ void test_int()
 
   for (int i = 0; i < 10; i++) {
     vector_push_back(vec, cemu_from(int, &i));
-    TEST_ASSERT(*(int *)vector_at(vec, i) == i, ERR_VECTOR_FIND);
+    TEST_ASSERT(*(int *)vector_at(vec, i) == i);
   }
 
   for (int i = 0; i < 5; i++) {
     vector_pop_back(vec);
   }
-  TEST_ASSERT(vector_size(vec) == 5, ERR_VECTOR_ERASE);
+  TEST_ASSERT(vector_size(vec) == 5);
 
   for (int i = 0; i < vector_size(vec); i++) {
-    TEST_ASSERT(*(int *)vector_at(vec, i) == i, ERR_VECTOR_FIND);
+    TEST_ASSERT(*(int *)vector_at(vec, i) == i);
   }
 
   vector_erase(vec, 0);
   vector_erase(vec, 0);
-  TEST_ASSERT(vector_size(vec) == 3, ERR_VECTOR_ERASE);
+  TEST_ASSERT(vector_size(vec) == 3);
 
   for (int i = 0; i < vector_size(vec); i++) {
-    TEST_ASSERT(*(int *)vector_at(vec, i) == i + 2, ERR_VECTOR_FIND);
+    TEST_ASSERT(*(int *)vector_at(vec, i) == i + 2);
   }
 
   delete_vector(vec);
@@ -81,7 +72,7 @@ void test_vector_int()
     vector_t *tmp = vector_at(vec1, i);
     for (int j = 0; j < 3; j++) {
       int *val = vector_at(tmp, j);
-      TEST_ASSERT(*val == j + 1, ERR_VECTOR_FIND);
+      TEST_ASSERT(*val == j + 1);
     }
   }
 
@@ -95,9 +86,9 @@ void test_string()
   vector_t *vec = new_vector(cemu_string());
 
   vector_push_back(vec, string_from("Hello"));
-  TEST_ASSERT(strcmp(string_at(vector_at(vec, 0), 0), "Hello") == 0, ERR_VECTOR_INSERT);
+  TEST_ASSERT(strcmp(string_at(vector_at(vec, 0), 0), "Hello") == 0);
   vector_push_back(vec, string_from("World"));
-  TEST_ASSERT(strcmp(string_at(vector_at(vec, 1), 0), "World") == 0, ERR_VECTOR_INSERT);
+  TEST_ASSERT(strcmp(string_at(vector_at(vec, 1), 0), "World") == 0);
 
   delete_vector(vec);
 }
@@ -127,8 +118,8 @@ void test_struct() {
 
   for (int i = 0; i < vector_size(vec); i++) {
     people_t p = *(people_t *)vector_at(vec, i);
-    TEST_ASSERT(strcmp(p.name, people[i].name) == 0, ERR_VECTOR_INSERT);
-    TEST_ASSERT(p.age == people[i].age, ERR_VECTOR_INSERT);
+    TEST_ASSERT(strcmp(p.name, people[i].name) == 0);
+    TEST_ASSERT(p.age == people[i].age);
   }
 
   delete_vector(vec);
